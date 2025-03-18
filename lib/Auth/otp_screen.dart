@@ -64,71 +64,74 @@ class _OtpScreenState extends State<OtpScreen> {
       appBar: AppBar(
         leading: const Icon(Icons.arrow_back_ios, color: Colors.black),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: height * 0.030),
-            const CustomText(
-              text: "OTP verification",
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-            SizedBox(height: height * 0.010),
-            const CustomText(
-              text: "Code will be sent on +923260483582",
-              fontSize: 14,
-            ),
-            SizedBox(height: height * 0.020),
-
-            TextFormField(
-              controller: otpController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                fillColor: Colors.grey.shade300,
-                filled: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: AppColors.lightWhite, width: 2),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: AppColors.lightWhite, width: 1),
-                ),
-                hintText: "Enter OTP",
-                suffixText:
-                    isResendEnabled
-                        ? "Resend OTP"
-                        : "Resend in $_secondsRemaining s",
-                suffixStyle: TextStyle(
-                  fontSize: 14,
-                  color: isResendEnabled ? Colors.blue : Colors.grey,
-                  fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: height * 0.030),
+              const CustomText(
+                text: "OTP verification",
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              SizedBox(height: height * 0.010),
+              const CustomText(
+                text: "Code will be sent on +923260483582",
+                fontSize: 14,
+              ),
+              SizedBox(height: height * 0.020),
+        
+              TextFormField(
+                controller: otpController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  fillColor: Colors.grey.shade300,
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: AppColors.lightGrey, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: AppColors.lightWhite, width: 2),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: AppColors.lightWhite, width: 1),
+                  ),
+                  hintText: "Enter OTP",
+                  suffixText:
+                      isResendEnabled
+                          ? "Resend OTP"
+                          : "Resend in $_secondsRemaining s",
+                  suffixStyle: TextStyle(
+                    fontSize: 14,
+                    color: isResendEnabled ? Colors.blue : Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: height*0.012,),
-            CustomText(text: "Send code on Email?",fontSize: 14,fontWeight: FontWeight.bold,color: AppColors.blackColor,),
-            SizedBox(height: height*0.1,),
-            InkWell(
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>BottomNavScreen()));
-              },
-              child: CustomContainer(
-                height: height*0.0550,
-                width: width,
-                color: AppColors.blackColor,
-                borderRadius: 15,
-                child: Center(child: CustomText(text: "Verify",fontSize: 18,fontWeight: FontWeight.bold,color: AppColors.whiteTheme,)),
+              SizedBox(height: height*0.012,),
+              CustomText(text: "Send code on Email?",fontSize: 14,fontWeight: FontWeight.bold,color: AppColors.blackColor,),
+              SizedBox(height: height*0.1,),
+              InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>BottomNavScreen()));
+                },
+                child: CustomContainer(
+                  height: height*0.0550,
+                  width: width,
+                  color: AppColors.blackColor,
+                  borderRadius: 15,
+                  child: Center(child: CustomText(text: "Verify",fontSize: 18,fontWeight: FontWeight.bold,color: AppColors.whiteTheme,)),
+                ),
               ),
-            ),
-            Image(image: AssetImage("assets/images/img_1.png"))
-          ],
+              SizedBox(height: height*0.020,),
+              Center(child: Image(image: AssetImage("assets/images/img_1.png"),height:height*0.4 ,))
+            ],
+          ),
         ),
       ),
     );
