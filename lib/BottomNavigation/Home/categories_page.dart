@@ -46,7 +46,7 @@ class _CategoriesGridState extends State<CategoriesGrid> {
             child: SizedBox(
               height: height * 0.15,
               child: Card(
-                color: isSelected ? AppColors.appColor : Colors.white,
+                color: isSelected ? AppColors.appColor : AppColors.whiteTheme,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(

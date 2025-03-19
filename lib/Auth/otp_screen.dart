@@ -26,7 +26,7 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void startTimer() {
-    _secondsRemaining = 30; // Reset timer
+    _secondsRemaining = 30;
     isResendEnabled = false;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
@@ -45,7 +45,7 @@ class _OtpScreenState extends State<OtpScreen> {
   void resendOTP() {
     if (isResendEnabled) {
       print("OTP Resent!");
-      startTimer(); // Restart timer
+      startTimer();
     }
   }
 
@@ -81,6 +81,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 text: "Code will be sent on +923260483582",
                 fontSize: 14,
               ),
+
               SizedBox(height: height * 0.020),
         
               TextFormField(

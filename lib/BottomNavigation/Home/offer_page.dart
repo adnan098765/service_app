@@ -13,7 +13,7 @@ class OfferBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.darkBlueShade,
+          color: AppColors.appColor,
           borderRadius: BorderRadius.circular(10),
         ),
         padding: EdgeInsets.all(16),
@@ -28,7 +28,7 @@ class OfferBanner extends StatelessWidget {
 
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppColors.whiteTheme,
                   ),
                   CustomText(
                     text: 'In Renovation Assistance Service',

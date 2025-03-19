@@ -36,8 +36,8 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: AppColors.darkBlueShade, // ✅ Active icon color
-        unselectedItemColor: AppColors.hintGrey, // ✅ Inactive icon color
+        selectedItemColor: AppColors.appColor,
+        unselectedItemColor: AppColors.hintGrey,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         elevation: 5,

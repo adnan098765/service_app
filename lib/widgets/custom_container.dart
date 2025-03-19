@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled2/AppColors/app_colors.dart';
 
 class CustomContainer extends StatelessWidget {
   final double width;
@@ -22,7 +23,8 @@ class CustomContainer extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: color, // ✅ Custom color user define karega
+        border: Border.all(color: AppColors.lightGrey),
+        color: color,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: child,

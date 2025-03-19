@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 
+import 'ViewAllServices/home_services_screen.dart';
 import 'categories_page.dart';
 import 'maintenance_page.dart';
 import 'offer_page.dart';
@@ -54,10 +55,15 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CustomText(text: "Categories", fontSize: 16),
-                  CustomText(
-                    text: "View All",
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                  InkWell(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeServicesScreen()));
+                    },
+                    child: CustomText(
+                      text: "View All",
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),

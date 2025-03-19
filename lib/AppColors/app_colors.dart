@@ -26,7 +26,7 @@ class AppColors {
   static Color lightOrange = Colors.orangeAccent.shade200;
   static const blueAccentColor = Colors.blueAccent;
   static const purpleColor = Colors.purple;
-  static Color darkGreen = Colors.green.shade800;
+  static Color ratingColor = Color(0xffede2e1);
   static const orangeAccentColor = Colors.orangeAccent;
   static const lightBlack = Colors.black54;
   static const yellowColor = Colors.yellow;

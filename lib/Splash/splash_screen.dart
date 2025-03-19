@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: AppColors.blackColor,
       body: Center(
         child: Text(
-          'Our Services',
+          'Tech Bees\nEnterprises',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
