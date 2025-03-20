@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
-import 'package:untitled2/BottomNavigation/Home/CleaningServices/cleaning_service_screen.dart';
+import 'package:untitled2/BottomNavigation/Home/CleaningServices/trending_service_screen.dart';
 import 'package:untitled2/BottomNavigation/Home/ViewAllServices/AcServiceDetails/ac_service_detail_screen.dart';
 import 'package:untitled2/BottomNavigation/Home/ViewAllServices/service_icon.dart';
 import 'package:untitled2/widgets/custom_container.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 
-import 'most_booked_services.dart';
 
-class HomeServicesScreen extends StatelessWidget {
-  HomeServicesScreen({super.key});
+class CleaningServiceScreen extends StatelessWidget {
+  CleaningServiceScreen({super.key});
   final TextEditingController searchController = TextEditingController();
 
   final List<Map<String, dynamic>> services = [
-    {'name': 'AC Services', 'icon': Icons.ac_unit},
-    {'name': 'Carpenter', 'icon': Icons.handyman},
-    {'name': 'Electrician', 'icon': Icons.electrical_services},
-    {'name': 'Geyser', 'icon': Icons.water},
-    {'name': 'Handyman', 'icon': Icons.build},
-    {'name': 'Home Appliances', 'icon': Icons.kitchen},
-    {'name': 'Home Inspection', 'icon': Icons.search},
-    {'name': 'Painter', 'icon': Icons.format_paint},
-    {'name': 'Pest Control', 'icon': Icons.bug_report},
-    {'name': 'Plumber', 'icon': Icons.plumbing},
+    {'name': 'Solar Panel\nCleaning', 'icon': Icons.solar_power},
+    {'name': 'Sofa Cleaning', 'icon': Icons.bed},
+    {'name': 'Plastic Water\nTank Cleaning', 'icon': Icons.propane_tank_rounded},
+    {'name': 'Mattress cleaning', 'icon': Icons.bed},
+    {'name': 'Deep Cleaning', 'icon': Icons.house},
+    {'name': 'Curtain Cleaning', 'icon': Icons.curtains_closed_outlined},
+    {'name': 'Commercial Deep\nCleaning', 'icon': Icons.house},
+    {'name': 'Chair Cleaning', 'icon': Icons.chair},
+    {'name': 'Cement water cleaning', 'icon': Icons.add_chart_sharp},
+    {'name': 'Carpet Cleaning', 'icon': Icons.class_rounded},
+    {'name': 'Car Detailing', 'icon': Icons.car_crash_outlined},
   ];
 
   // Function to navigate based on index
@@ -69,7 +69,7 @@ class HomeServicesScreen extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
-              title: const Text("Home Services"),
+              title: const Text("Cleaning Services"),
               floating: true,
               pinned: true,
               leading: const Icon(Icons.arrow_back),
@@ -87,9 +87,7 @@ class HomeServicesScreen extends StatelessWidget {
             ),
             SliverList(
               delegate: SliverChildListDelegate([
-                const SizedBox(height: 24),
-                const ServiceList(),
-                const SizedBox(height: 24),
+                const SizedBox(height: 10),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
@@ -104,8 +102,9 @@ class HomeServicesScreen extends StatelessWidget {
                   itemCount: services.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    crossAxisSpacing: 2,
-                    mainAxisSpacing: 2, // Adjust spacing
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    mainAxisExtent: 150// Adjust spacing
                   ),
                   itemBuilder: (context, index) {
                     return GestureDetector(
@@ -117,33 +116,9 @@ class HomeServicesScreen extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(height: 16), // Reduced space before explore button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Card(
-                    child: InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>CleaningServiceScreen()));
-                      },
-                      child: CustomContainer(
-                        height: height * 0.070,
-                        width: width*0.3,
-                        borderRadius: 20,
-                        color: AppColors.blueAccentColor,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CustomText(
-                              text: "Explore cleaning service",
-                              fontWeight: FontWeight.bold,
-                            ),
-                            const Icon(Icons.arrow_forward),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                TrendingServiceScreen(),
+                SizedBox(height: 16),
+
                 SizedBox(height: height * 0.030,)
               ]),
             ),

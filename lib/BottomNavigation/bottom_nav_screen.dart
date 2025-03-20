@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
-import 'package:untitled2/BottomNavigation/Calendar/calender_screen.dart';
 import 'package:untitled2/BottomNavigation/Chat/chat_screen.dart';
 
 import 'Home/home_screen.dart';
+import 'Order/order_screen.dart';
 import 'Profile/profile_screen.dart';
 
 class BottomNavScreen extends StatefulWidget {
@@ -18,8 +18,8 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
 
   final List<Widget> _screens = [
     HomeScreen(),
-    CalenderScreen(),
-    ChatScreen(),
+    OrdersScreen(),
+    // ChatScreen(),
     ProfileScreen(),
   ];
 
@@ -45,8 +45,8 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home, size: 28), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today, size: 28), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.message, size: 28), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.list, size: 28), label: ''),
+          // BottomNavigationBarItem(icon: Icon(Icons.message, size: 28), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.person, size: 28), label: ''),
         ],
       ),

@@ -13,142 +13,208 @@ class AuthenticationScreen extends StatefulWidget {
 
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
   final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  String selectedGender = "Male";
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: AppColors.whiteTheme,
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: height * 0.04),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: CustomContainer(
-                  height: height * 0.040,
-                  width: width * 0.2,
-                  borderRadius: 20,
-                  color: AppColors.blackColor,
-                  child: Center(
-                    child: CustomText(
-                      text: "Guest",
-                      fontSize: 16,
-                      color: AppColors.whiteTheme,
-                    ),
-                  ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: height * 0.04),
+                CustomText(
+                  text: "Welcome to our company",
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
-              ),
-              SizedBox(height: height * 0.040),
-              CustomText(
-                text: "Welcome to our company",
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-              CustomText(
-                text: "Please enter your phone number to continue",
-                fontSize: 16,
-              ),
-              SizedBox(height: height * 0.040),
-              TextFormField(
-                controller: phoneNumberController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  fillColor: Colors.grey.shade300,
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: AppColors.lightGrey,
-                      width: 1,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: AppColors.lightWhite,
-                      width: 2,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: AppColors.lightWhite,
-                      width: 1,
-                    ),
-                  ),
-                  hintText: "Enter phone number",
+                CustomText(
+                  text: "Please enter your phone number to continue",
+                  fontSize: 16,
                 ),
-              ),
-              SizedBox(height: height * 0.020),
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => OtpScreen()),
-                  );
-                },
-                child: CustomContainer(
-                  height: height * 0.0550,
-                  width: width,
-                  color: AppColors.blackColor,
-                  borderRadius: 15,
-                  child: Center(
-                    child: CustomText(
-                      text: "Continue",
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.whiteTheme,
-                    ),
-                  ),
-                ),
-              ),
-              Spacer(),
-              Center(
-                child: CustomText(
-                  text: "By Continuing, you agree to our company's ",
-                  fontSize: 14,
-                  color: AppColors.hintGrey,
-                ),
-              ),
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                    style: TextStyle(fontSize: 14, color: AppColors.blackColor),
-                    children: [
-                      TextSpan(
-                        text: 'Terms & conditions ',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
+                SizedBox(height: height * 0.040),
+                TextFormField(
+                  controller: phoneNumberController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    fillColor: Colors.grey.shade300,
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColors.lightGrey,
+                        width: 1,
                       ),
-                      TextSpan(
-                        text: 'and accept our ',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.blackColor,
-                        ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColors.lightWhite,
+                        width: 2,
                       ),
-                      TextSpan(
-                        text: 'privacy policy',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColors.lightWhite,
+                        width: 1,
                       ),
-                    ],
+                    ),
+                    hintText: "Enter phone number",
                   ),
                 ),
-              ),
+                SizedBox(height: height * 0.020),
 
-              SizedBox(height: height * 0.050),
-            ],
+                // Gender Dropdown
+                DropdownButtonFormField<String>(
+                  value: selectedGender,
+                  decoration: InputDecoration(
+                    fillColor: Colors.grey.shade300,
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColors.lightGrey,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColors.lightWhite,
+                        width: 2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColors.lightWhite,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  dropdownColor: Colors.grey.shade300,
+                  style: TextStyle(fontSize: 16, color: Colors.black),  
+                  items: ["Male", "Female", "Other"].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedGender = newValue!;
+                    });
+                  },
+                ),
+
+                SizedBox(height: height * 0.020),
+
+                TextFormField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    fillColor: Colors.grey.shade300,
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColors.lightGrey,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColors.lightWhite,
+                        width: 2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColors.lightWhite,
+                        width: 1,
+                      ),
+                    ),
+                    hintText: "Enter your email (optional)",
+                  ),
+                ),
+
+                SizedBox(height: height * 0.020),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => OtpScreen()),
+                    );
+                  },
+                  child: CustomContainer(
+                    height: height * 0.0550,
+                    width: width,
+                    color: AppColors.blackColor,
+                    borderRadius: 15,
+                    child: Center(
+                      child: CustomText(
+                        text: "Continue",
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.whiteTheme,
+                      ),
+                    ),
+                  ),
+                ),
+                Image(image: AssetImage("assets/images/img_2.png"), height: height * 0.3, width: width),
+                SizedBox(height: height * 0.050), // Replaced Spacer() with SizedBox
+                Center(
+                  child: CustomText(
+                    text: "By Continuing, you agree to our company's ",
+                    fontSize: 14,
+                    color: AppColors.hintGrey,
+                  ),
+                ),
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                      style: TextStyle(fontSize: 14, color: AppColors.blackColor),
+                      children: [
+                        TextSpan(
+                          text: 'Terms & conditions ',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'and accept our ',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.blackColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'privacy policy',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: height * 0.050),
+              ],
+            ),
           ),
         ),
       ),

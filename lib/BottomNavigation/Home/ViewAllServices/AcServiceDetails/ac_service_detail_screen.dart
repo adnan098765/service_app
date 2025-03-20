@@ -71,8 +71,8 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
     },
     {
       'image': 'assets/images/img.png',
-      'title': 'Floor standing cabinait Ac general service ',
-      'description': 'Visit and inspection chaarges ',
+      'title': 'Floor standing cabinet Ac general service ',
+      'description': 'Visit and inspection charges ',
       'oldPrice': 2600,
       'newPrice': 1850,
       'rating': 4.3,
@@ -105,7 +105,7 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
       floatingActionButton:
           isVisible
               ? FloatingActionButton.extended(
-            backgroundColor: AppColors.darkBlueShade,
+                backgroundColor: AppColors.darkBlueShade,
                 onPressed: () {},
                 label: Row(
                   children: [
@@ -113,10 +113,18 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:
                           selectedServices.entries
-                              .map((e) => Text("${e.key}: ${e.value}",style: TextStyle(color: AppColors.whiteTheme),))
+                              .map(
+                                (e) => Text(
+                                  "${e.key}: ${e.value}",
+                                  style: TextStyle(color: AppColors.whiteTheme),
+                                ),
+                              )
                               .toList(),
                     ),
-                    const Icon(Icons.arrow_forward,color: AppColors.whiteTheme,),
+                    const Icon(
+                      Icons.arrow_forward,
+                      color: AppColors.whiteTheme,
+                    ),
                   ],
                 ),
               )
@@ -139,24 +147,15 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
                 filled: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                    color: AppColors.whiteTheme,
-                    width: 1,
-                  ),
+                  borderSide: BorderSide(color: AppColors.whiteTheme, width: 1),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                    color: AppColors.lightWhite,
-                    width: 2,
-                  ),
+                  borderSide: BorderSide(color: AppColors.lightWhite, width: 2),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                    color: AppColors.lightWhite,
-                    width: 1,
-                  ),
+                  borderSide: BorderSide(color: AppColors.lightWhite, width: 1),
                 ),
                 hintText: "Search",
               ),
@@ -227,12 +226,12 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
               borderRadius: BorderRadius.circular(8),
               child: Image.asset(
                 widget.image,
-                width: width*0.220,
-                height: height*0.090,
+                width: width * 0.220,
+                height: height * 0.090,
                 fit: BoxFit.cover,
               ),
             ),
-             SizedBox(width:width*0.0240),
+            SizedBox(width: width * 0.0240),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,7 +256,7 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
                           color: AppColors.blueAccentColor,
                         ),
                       ),
-                       SizedBox(width: width*0.014),
+                      SizedBox(width: width * 0.014),
                       Text(
                         'Rs. ${widget.newPrice}',
                         style: const TextStyle(
@@ -276,106 +275,116 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.star,size: 14,color: AppColors.greenColor,),
-                        Text("${widget.rating}",style: TextStyle(color: AppColors.greenColor),)
+                        Icon(Icons.star, size: 14, color: AppColors.greenColor),
+                        Text(
+                          "${widget.rating}",
+                          style: TextStyle(color: AppColors.greenColor),
+                        ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
             count == 0
                 ? SizedBox(
-              height: height*0.040,
-              width:width*0.2210,
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() => count++);
-                  widget.onServiceUpdate(widget.title, true);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.blueColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.add, color: Colors.white, size: 20),
-                    const SizedBox(width: 5),
-                    Text(
-                      "ADD",
-                      style: TextStyle(
-                        color: AppColors.whiteTheme,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-                : Container(
-              height:height*0.040,
-              width:width*0.250,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.blueColor, width: 1.5),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      if (count > 0) {
-                        setState(() => count--);
-                        widget.onServiceUpdate(widget.title, false);
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(6),
-                    child: Container(
-                      height: height*0.042,
-                      width: width*0.072,
-                      decoration: BoxDecoration(
-                        color: AppColors.blueColor,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(Icons.remove, color: Colors.white, size: 20),
-                    ),
-                  ),
-                  SizedBox(width:width*0.029,),
-                  Text(
-                    '$count',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Spacer(),
-                  InkWell(
-                    onTap: () {
+                  height: height * 0.040,
+                  width: width * 0.2210,
+                  child: ElevatedButton(
+                    onPressed: () {
                       setState(() => count++);
                       widget.onServiceUpdate(widget.title, true);
                     },
-                    borderRadius: BorderRadius.circular(6),
-                    child: Container(
-
-                      height: height*0.042,
-                      width: width*0.072,
-                      decoration: BoxDecoration(
-                        color: AppColors.blueColor,
-                        borderRadius: BorderRadius.circular(6),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.blueColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.add, color: Colors.white, size: 20),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.add, color: Colors.white, size: 20),
+                        const SizedBox(width: 5),
+                        Text(
+                          "ADD",
+                          style: TextStyle(
+                            color: AppColors.whiteTheme,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-
-
-
+                )
+                : Container(
+                  height: height * 0.040,
+                  width: width * 0.250,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.blueColor, width: 1.5),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          if (count > 0) {
+                            setState(() => count--);
+                            widget.onServiceUpdate(widget.title, false);
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(6),
+                        child: Container(
+                          height: height * 0.042,
+                          width: width * 0.072,
+                          decoration: BoxDecoration(
+                            color: AppColors.blueColor,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Icon(
+                            Icons.remove,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: width * 0.029),
+                      Text(
+                        '$count',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Spacer(),
+                      InkWell(
+                        onTap: () {
+                          setState(() => count++);
+                          widget.onServiceUpdate(widget.title, true);
+                        },
+                        borderRadius: BorderRadius.circular(6),
+                        child: Container(
+                          height: height * 0.042,
+                          width: width * 0.072,
+                          decoration: BoxDecoration(
+                            color: AppColors.blueColor,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
           ],
         ),
       ),
