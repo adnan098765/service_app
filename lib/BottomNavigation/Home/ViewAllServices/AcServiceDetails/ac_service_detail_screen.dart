@@ -77,13 +77,14 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: AppColors.whiteTheme,
       floatingActionButton: isVisible
           ? FloatingActionButton.extended(
         backgroundColor: AppColors.darkBlueShade,
         onPressed: () {
-          // Navigate to CheckoutScreen
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -103,24 +104,25 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                "${selectedServices.length}", // Total unique services
+                "${selectedServices.length}",
                 style: TextStyle(
                   color: AppColors.whiteTheme,
                   fontSize: 14,
                 ),
               ),
             ),
-            SizedBox(width: 5),
+            SizedBox(width:width*0.015),
             Text(
               "Continue",
               style: TextStyle(
                 color: AppColors.whiteTheme,
                 fontSize: 16,
               ),
-            ),            SizedBox(width: 5),
+            ),
+            SizedBox(width:width*0.015),
 
             Icon(Icons.arrow_forward,color: AppColors.whiteTheme,),
-            SizedBox(width: 10),
+            SizedBox(width:width*0.015),
           ],
         ),
       )
@@ -300,7 +302,7 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
                   ),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  // mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.add, color: Colors.white, size: 20),
                     const SizedBox(width: 5),

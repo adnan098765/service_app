@@ -117,7 +117,7 @@ class HomeServicesScreen extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(height: 16), // Reduced space before explore button
+                SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Card(

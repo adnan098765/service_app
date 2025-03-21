@@ -75,9 +75,11 @@ class ServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     return Container(
-      height: 120,
-      width: 300,
+      height: height*0.148,
+      width: width*0.800,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.blue,
@@ -85,8 +87,16 @@ class ServiceCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Image.asset("assets/images/img.png", width: 80),
-          const SizedBox(width: 10),
+          Container(
+            height: height*0.110,
+            width: width*0.250,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              image: DecorationImage(image: AssetImage("assets/images/img.png",),fit: BoxFit.cover )
+            ),
+          ),
+
+           SizedBox(width:width*0.020),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +112,7 @@ class ServiceCard extends StatelessWidget {
                         decoration: TextDecoration.lineThrough,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                     SizedBox(width:width*0.015),
                     Text(
                       discountedPrice,
                       style: const TextStyle(
