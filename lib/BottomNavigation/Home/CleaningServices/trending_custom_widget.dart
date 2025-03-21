@@ -23,12 +23,18 @@ class TrendingCustomWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
+        color: AppColors.whiteTheme,
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1),
+          BoxShadow(
+            color: AppColors.lightBlack,
+            blurRadius: 3,
+            spreadRadius: 1,
+          ),
         ],
       ),
       margin: EdgeInsets.all(8),
@@ -40,32 +46,55 @@ class TrendingCustomWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
               imageUrl,
-              height: 100,
-              width: double.infinity,
+              height: height * 0.110,
+              width: width,
               fit: BoxFit.cover,
             ),
           ),
-          SizedBox(height: 8),
-          Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          SizedBox(height: height * 0.010),
+          Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
           Row(
             children: [
-              Icon(Icons.check_circle_outline, size: 14, color: AppColors.hintGrey),
+              Icon(
+                Icons.check_circle_outline,
+                size: 14,
+                color: AppColors.hintGrey,
+              ),
               SizedBox(width: 4),
-              Text("$orders orders", style: TextStyle(fontSize: 12, color: AppColors.hintGrey)),
+              Text(
+                "$orders orders",
+                style: TextStyle(fontSize: 12, color: AppColors.hintGrey),
+              ),
               Spacer(),
-              Icon(Icons.star, size: 14, color:  AppColors.yellowColor),
-              Text("$rating", style: TextStyle(fontSize: 12,color: AppColors.yellowColor)),
+              Icon(Icons.star, size: 14, color: AppColors.yellowColor),
+              Text(
+                "$rating",
+                style: TextStyle(fontSize: 12, color: AppColors.yellowColor),
+              ),
             ],
           ),
-          Text(description, style: TextStyle(fontSize: 12,  color: AppColors.hintGrey)),
+          Text(
+            description,
+            style: TextStyle(fontSize: 12, color: AppColors.hintGrey),
+          ),
           Row(
             children: [
               Text(
                 "Rs. $oldPrice",
-                style: TextStyle(decoration: TextDecoration.lineThrough, fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  decoration: TextDecoration.lineThrough,
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
               ),
-              SizedBox(width: 5),
-              Text("Rs. $newPrice", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              SizedBox(width: width * 0.05),
+              Text(
+                "Rs. $newPrice",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         ],

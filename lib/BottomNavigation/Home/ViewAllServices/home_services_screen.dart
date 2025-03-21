@@ -123,7 +123,7 @@ class HomeServicesScreen extends StatelessWidget {
                   child: Card(
                     child: InkWell(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>CleaningServiceScreen()));
+                        // Navigator.push(context, MaterialPageRoute(builder: (context)=>CleaningServiceScreen()));
                       },
                       child: CustomContainer(
                         height: height * 0.070,

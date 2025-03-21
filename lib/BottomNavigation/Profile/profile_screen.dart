@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
+import 'package:untitled2/BottomNavigation/Order/order_screen.dart';
 import 'package:untitled2/BottomNavigation/Profile/Account/account_screen.dart';
+import 'package:untitled2/BottomNavigation/Profile/OrderPage/order_screen.dart';
+import 'package:untitled2/BottomNavigation/Profile/Wallet/wallet_screen.dart';
+import 'package:untitled2/WebPages/about_us.dart';
+import 'package:untitled2/WebPages/privacy_policy.dart';
+import 'package:untitled2/WebPages/terms_and_conditions.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 import 'dart:io';
 
@@ -126,11 +132,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>AccountScreen()));
                     },
                       child: MenuTile(icon: Icons.person, title: "Account")),
-                  MenuTile(icon: Icons.list, title: "Orders"),
-                  MenuTile(icon: Icons.account_balance_wallet, title: "Wallet"),
-                  MenuTile(icon: Icons.help_outline_outlined, title: "About us"),
-                  MenuTile(icon: Icons.request_page_sharp, title: "Terms and Conditions"),
-                  MenuTile(icon: Icons.lock_person_outlined, title: "Privacy policy"),
+                  InkWell(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>OrderScreenProfile()));
+                    },
+                      child: MenuTile(icon: Icons.list, title: "Orders")),
+                  InkWell(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>WalletScreen()));
+                      },
+                      child: MenuTile(icon: Icons.account_balance_wallet, title: "Wallet")),
+                  InkWell(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>AboutUs()));
+                    },
+                      child: MenuTile(icon: Icons.help_outline_outlined, title: "About us")),
+                  InkWell(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>TermsAndConditions()));
+                    },
+                      child: MenuTile(icon: Icons.request_page_sharp, title: "Terms and Conditions")),
+                  InkWell(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>PrivacyPolicy()));
+                      },
+                      child: MenuTile(icon: Icons.lock_person_outlined, title: "Privacy policy")),
                   MenuTile(icon: Icons.logout, title: "Log Out"),
                 ],
               ),

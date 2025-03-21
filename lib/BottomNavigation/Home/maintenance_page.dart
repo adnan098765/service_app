@@ -8,7 +8,7 @@ class MaintenanceBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(8.0),
       child: Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -34,7 +34,7 @@ class MaintenanceBanner extends StatelessWidget {
                         ),
                         backgroundColor: AppColors.darkBlueShade,
                       ),
-                      SizedBox(width: 5),
+                      SizedBox(width: 2),
                       Chip(
                         label: CustomText(
                           text: "Commercial",

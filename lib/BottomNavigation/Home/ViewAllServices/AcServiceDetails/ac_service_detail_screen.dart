@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled2/CheckOut/check_out_screen.dart';
 import '../../../../AppColors/app_colors.dart';
 
 class ACServiceScreen extends StatefulWidget {
@@ -20,30 +21,6 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
       'oldPrice': 1200,
       'newPrice': 1000,
       'rating': 4.8,
-    },
-    {
-      'image': 'assets/images/img.png',
-      'title': 'AC General Service',
-      'description': 'Per AC (1 to 2.5 tons)',
-      'oldPrice': 3500,
-      'newPrice': 1850,
-      'rating': 4.3,
-    },
-    {
-      'image': 'assets/images/img.png',
-      'title': 'AC installation',
-      'description': 'Ac installation with 10 feet pipe(1 to2.5 tons)',
-      'oldPrice': 3500,
-      'newPrice': 1850,
-      'rating': 4.3,
-    },
-    {
-      'image': 'assets/images/img.png',
-      'title': 'AC mounting and dismounting + Ac general service ',
-      'description': 'Per AC (1 to 2.5 tons)',
-      'oldPrice': 3500,
-      'newPrice': 1850,
-      'rating': 4.3,
     },
     {
       'image': 'assets/images/img.png',
@@ -77,15 +54,17 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
       'newPrice': 1850,
       'rating': 4.3,
     },
+    // Add other services here...
   ];
+
   final TextEditingController searchController = TextEditingController();
+
   void updateService(String title, bool isAdding) {
     setState(() {
       if (isAdding) {
         selectedServices[title] = (selectedServices[title] ?? 0) + 1;
       } else {
-        if (selectedServices.containsKey(title) &&
-            selectedServices[title]! > 0) {
+        if (selectedServices.containsKey(title) && selectedServices[title]! > 0) {
           selectedServices[title] = selectedServices[title]! - 1;
           if (selectedServices[title] == 0) {
             selectedServices.remove(title);
@@ -98,37 +77,54 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: AppColors.whiteTheme,
-      floatingActionButton:
-          isVisible
-              ? FloatingActionButton.extended(
-                backgroundColor: AppColors.darkBlueShade,
-                onPressed: () {},
-                label: Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children:
-                          selectedServices.entries
-                              .map(
-                                (e) => Text(
-                                  "${e.key}: ${e.value}",
-                                  style: TextStyle(color: AppColors.whiteTheme),
-                                ),
-                              )
-                              .toList(),
-                    ),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: AppColors.whiteTheme,
-                    ),
-                  ],
+      floatingActionButton: isVisible
+          ? FloatingActionButton.extended(
+        backgroundColor: AppColors.darkBlueShade,
+        onPressed: () {
+          // Navigate to CheckoutScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CheckoutScreen(
+                selectedServices: selectedServices,
+              ),
+            ),
+          );
+        },
+        label: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.darkBlueShade,
+                border: Border.all(color: AppColors.whiteTheme),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                "${selectedServices.length}", // Total unique services
+                style: TextStyle(
+                  color: AppColors.whiteTheme,
+                  fontSize: 14,
                 ),
-              )
-              : null,
+              ),
+            ),
+            SizedBox(width: 5),
+            Text(
+              "Continue",
+              style: TextStyle(
+                color: AppColors.whiteTheme,
+                fontSize: 16,
+              ),
+            ),            SizedBox(width: 5),
+
+            Icon(Icons.arrow_forward,color: AppColors.whiteTheme,),
+            SizedBox(width: 10),
+          ],
+        ),
+      )
+          : null,
       appBar: AppBar(
         title: const Text('AC Services'),
         backgroundColor: Colors.white,
@@ -160,7 +156,6 @@ class _ACServiceScreenState extends State<ACServiceScreen> {
                 hintText: "Search",
               ),
             ),
-
             Expanded(
               child: ListView.builder(
                 itemCount: services.length,
@@ -217,7 +212,6 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
     double width = MediaQuery.of(context).size.width;
     return Card(
       color: AppColors.whiteTheme,
-      // margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Row(
@@ -288,103 +282,103 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
             ),
             count == 0
                 ? SizedBox(
-                  height: height * 0.040,
-                  width: width * 0.2210,
-                  child: ElevatedButton(
-                    onPressed: () {
+              height: height * 0.040,
+              width: width * 0.2210,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() => count++);
+                  widget.onServiceUpdate(widget.title, true);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blueColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.add, color: Colors.white, size: 20),
+                    const SizedBox(width: 5),
+                    Text(
+                      "ADD",
+                      style: TextStyle(
+                        color: AppColors.whiteTheme,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+                : Container(
+              height: height * 0.040,
+              width: width * 0.250,
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.blueColor, width: 1.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      if (count > 0) {
+                        setState(() => count--);
+                        widget.onServiceUpdate(widget.title, false);
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      height: height * 0.042,
+                      width: width * 0.072,
+                      decoration: BoxDecoration(
+                        color: AppColors.blueColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.remove,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: width * 0.029),
+                  Text(
+                    '$count',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Spacer(),
+                  InkWell(
+                    onTap: () {
                       setState(() => count++);
                       widget.onServiceUpdate(widget.title, true);
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.blueColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      height: height * 0.042,
+                      width: width * 0.072,
+                      decoration: BoxDecoration(
+                        color: AppColors.blueColor,
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 20,
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.add, color: Colors.white, size: 20),
-                        const SizedBox(width: 5),
-                        Text(
-                          "ADD",
-                          style: TextStyle(
-                            color: AppColors.whiteTheme,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
-                )
-                : Container(
-                  height: height * 0.040,
-                  width: width * 0.250,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.blueColor, width: 1.5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          if (count > 0) {
-                            setState(() => count--);
-                            widget.onServiceUpdate(widget.title, false);
-                          }
-                        },
-                        borderRadius: BorderRadius.circular(6),
-                        child: Container(
-                          height: height * 0.042,
-                          width: width * 0.072,
-                          decoration: BoxDecoration(
-                            color: AppColors.blueColor,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Icon(
-                            Icons.remove,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: width * 0.029),
-                      Text(
-                        '$count',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      InkWell(
-                        onTap: () {
-                          setState(() => count++);
-                          widget.onServiceUpdate(widget.title, true);
-                        },
-                        borderRadius: BorderRadius.circular(6),
-                        child: Container(
-                          height: height * 0.042,
-                          width: width * 0.072,
-                          decoration: BoxDecoration(
-                            color: AppColors.blueColor,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
