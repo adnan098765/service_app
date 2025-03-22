@@ -33,6 +33,8 @@ class _CategoriesGridState extends State<CategoriesGrid> {
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           childAspectRatio: 0.9,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
         ),
         itemCount: categories.length,
         itemBuilder: (context, index) {
@@ -43,38 +45,45 @@ class _CategoriesGridState extends State<CategoriesGrid> {
                 _selectedIndex = index;
               });
             },
-            child: SizedBox(
-              height: height * 0.15,
-              child: Card(
+            child: Container(
+              decoration: BoxDecoration(
                 color: isSelected ? AppColors.appColor : AppColors.whiteTheme,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color:
-                        isSelected ? Colors.transparent : Colors.grey.shade300,
-                    width: 1,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 3),
                   ),
-                ),
-                elevation: isSelected ? 2 : 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      categories[index]['icon'],
-                      color: isSelected ? Colors.white : Colors.black,
-                      size: 35,
+                ],
+                gradient: isSelected
+                    ? LinearGradient(
+                  colors: [AppColors.appColor, AppColors.darkBlueShade],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+                    : null,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    categories[index]['icon'],
+                    color: isSelected ? Colors.white : AppColors.appColor,
+                    size: 35,
+                  ),
+                  SizedBox(height: height * 0.010),
+                  Text(
+                    categories[index]['label'],
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : AppColors.appColor,
+                      fontWeight:
+                      isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontSize: 14,
                     ),
-                     SizedBox(height:height*0.010),
-                    Text(
-                      categories[index]['label'],
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );

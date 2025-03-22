@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:date_picker_timetable/date_picker_timetable.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
-import 'package:untitled2/BottomNavigation/Home/ViewAllServices/home_services_screen.dart';
 import 'package:untitled2/CheckOut/peament_method.dart';
 import 'package:untitled2/CheckOut/quantity_selector.dart';
 import 'package:untitled2/widgets/custom_text.dart';
+import '../widgets/custom_container.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final Map<String, int> selectedServices;
@@ -58,8 +58,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       builder: (context) {
         double height = MediaQuery.of(context).size.height;
         return Container(
-          height: height*0.500,
+          height: height * 0.500,
           padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.whiteTheme,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -74,33 +78,37 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   itemCount: citiesWithAddresses.length,
                   itemBuilder: (context, index) {
                     final cityData = citiesWithAddresses[index];
-                    return ListTile(
-                      leading: Checkbox(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                    return Card(
+                      margin: EdgeInsets.symmetric(vertical: 5),
+                      elevation: 2,
+                      child: ListTile(
+                        leading: Checkbox(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          activeColor: AppColors.darkBlueShade,
+                          value: isChecked,
+                          onChanged: (value) {
+                            setState(() {
+                              isChecked = value!;
+                            });
+                          },
                         ),
-                        activeColor: AppColors.darkBlueShade,
-                        value: isChecked,
-                        onChanged: (value) {
+                        title: Text(
+                          "${cityData["city"]} - ${cityData["area"]}",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          cityData["address"]!,
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        onTap: () {
                           setState(() {
-                            isChecked = value!;
+                            _address = cityData["address"]!;
                           });
+                          Navigator.pop(context);
                         },
                       ),
-                      title: Text(
-                        "${cityData["city"]} - ${cityData["area"]}",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        cityData["address"]!,
-                        style: TextStyle(fontSize: 14),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _address = cityData["address"]!;
-                        });
-                        Navigator.pop(context);
-                      },
                     );
                   },
                 ),
@@ -143,8 +151,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Checkout"),
+        title: Text("Checkout", style: TextStyle(color: AppColors.whiteTheme)),
         centerTitle: true,
+        backgroundColor: AppColors.darkBlueShade,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppColors.whiteTheme),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -183,17 +194,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             _buildTotalPriceSection(totalPrice),
             SizedBox(height: 10),
             SizedBox(height: 30),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Place order logic
-                },
-                child: Text("Place Order", style: TextStyle(fontSize: 18)),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
+            CustomContainer(
+              height: 50,
+              width: double.infinity,
+              color: AppColors.darkBlueShade,
+              borderRadius: 15,
+              child: Center(
+                child: CustomText(
+                  text: "Place Order",
+                  color: AppColors.whiteTheme,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -209,7 +220,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       children: [
         Row(
           children: [
-            Text("Selected schedule"),
+            Text("Selected schedule", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             SizedBox(width: 6),
             _selectedDate != null && _selectedTime != null
                 ? Text(
@@ -229,14 +240,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey.shade300),
+            color: AppColors.whiteTheme,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
           child: DatePicker(
             DateTime.now(),
             width: 60,
             height: 90,
             initialSelectedDate: _selectedDate,
-            selectionColor: Colors.blueAccent.shade100,
-            selectedTextColor: AppColors.darkBlueShade,
+            selectionColor: AppColors.darkBlueShade,
+            selectedTextColor: AppColors.whiteTheme,
             daysCount: 60,
             onDateChange: (date) {
               setState(() {
@@ -261,6 +281,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: AppColors.grey300),
+            color: AppColors.whiteTheme,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
@@ -279,12 +308,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: _selectedIndex == index
-                          ? AppColors.blueAccentColor
+                          ? AppColors.darkBlueShade
                           : Colors.transparent,
                       width: 2,
                     ),
                     color: _selectedIndex == index
-                        ? Colors.blueAccent.shade100
+                        ? AppColors.darkBlueShade.withOpacity(0.1)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -319,6 +348,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey.shade300),
+            color: AppColors.whiteTheme,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
           child: Row(
             children: [
@@ -329,7 +367,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.edit, color: AppColors.blueAccentColor),
+                icon: Icon(Icons.edit, color: AppColors.darkBlueShade),
                 onPressed: _editAddress,
               ),
             ],
@@ -343,19 +381,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Material(
       borderRadius: BorderRadius.circular(14),
       color: AppColors.lightGrey,
+      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            CustomText(text: "Total Price", fontSize: 16),
+            CustomText(text: "Total Price", fontSize: 16, fontWeight: FontWeight.bold),
             Spacer(),
-            CustomText(text: "Rs. $totalPrice", fontSize: 16),
+            CustomText(text: "Rs. $totalPrice", fontSize: 16, fontWeight: FontWeight.bold),
           ],
         ),
       ),
     );
   }
-
 }
 
 class ServiceCard extends StatelessWidget {
@@ -380,11 +418,12 @@ class ServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-
     return Card(
       margin: EdgeInsets.only(bottom: 10),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Padding(
         padding: EdgeInsets.all(10),
         child: Row(
@@ -434,4 +473,3 @@ class ServiceCard extends StatelessWidget {
     );
   }
 }
-

@@ -3,7 +3,7 @@ import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/BottomNavigation/Chat/chat_screen.dart';
 
 import 'Home/home_screen.dart';
-import 'Order/order_screen.dart';
+import 'Order/order_tabbar.dart';
 import 'Profile/profile_screen.dart';
 
 class BottomNavScreen extends StatefulWidget {

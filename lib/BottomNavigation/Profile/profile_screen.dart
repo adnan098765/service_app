@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
-import 'package:untitled2/BottomNavigation/Order/order_screen.dart';
+import 'package:untitled2/Auth/authentication_screen.dart';
+import 'package:untitled2/BottomNavigation/Order/order_tabbar.dart';
 import 'package:untitled2/BottomNavigation/Profile/Account/account_screen.dart';
 import 'package:untitled2/BottomNavigation/Profile/OrderPage/order_screen.dart';
 import 'package:untitled2/BottomNavigation/Profile/Wallet/wallet_screen.dart';
@@ -32,6 +33,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _image = File(pickedFile.path);
       });
     }
+  }
+  void _logOu() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Log Out", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          content: Text("Are you sur!", style: TextStyle(fontSize: 14)),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel", style: TextStyle(color: AppColors.blackColor)),
+            ),
+            TextButton(
+              onPressed: () {
+
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>AuthenticationScreen())); // Close the dialog
+              },
+              child: Text("OK", style: TextStyle(color: AppColors.blackColor)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -157,7 +184,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.push(context, MaterialPageRoute(builder: (context)=>PrivacyPolicy()));
                       },
                       child: MenuTile(icon: Icons.lock_person_outlined, title: "Privacy policy")),
-                  MenuTile(icon: Icons.logout, title: "Log Out"),
+                  InkWell(
+                    onTap: _logOu,
+                      child: MenuTile(icon: Icons.logout, title: "Log Out")),
                 ],
               ),
             ],

@@ -11,6 +11,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: AppColors.lightGrey,
@@ -26,7 +27,7 @@ class HomeScreen extends StatelessWidget {
               CircleAvatar(
                 backgroundImage: AssetImage('assets/images/img.png'),
               ),
-              const SizedBox(width: 10),
+               SizedBox(width: width*0.014),
             ],
           ),
         ),
@@ -41,9 +42,9 @@ class HomeScreen extends StatelessWidget {
                 horizontal: 16.0,
                 vertical: 16,
               ),
-              child: Text(
+              child: CustomText(text:
                 'Welcome To Our App',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                fontSize: 20, fontWeight: FontWeight.bold
               ),
             ),
             SizedBox(height: height * 0.020),
@@ -69,7 +70,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             CategoriesGrid(),
-            SizedBox(height: 20),
+            SizedBox(height: height*0.020),
             MaintenanceBanner(),
           ],
         ),

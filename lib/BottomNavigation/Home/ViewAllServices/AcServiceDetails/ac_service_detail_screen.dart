@@ -285,7 +285,7 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
             count == 0
                 ? SizedBox(
               height: height * 0.040,
-              width: width * 0.2210,
+              width: width * 0.178,
               child: ElevatedButton(
                 onPressed: () {
                   setState(() => count++);
@@ -304,14 +304,14 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
                 child: Row(
                   // mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.add, color: Colors.white, size: 20),
-                    const SizedBox(width: 5),
+                    const Icon(Icons.add, color: AppColors.whiteTheme, size: 14),
+                     SizedBox(width: width*0.010),
                     Text(
                       "ADD",
                       style: TextStyle(
                         color: AppColors.whiteTheme,
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
                     ),
                   ],
@@ -320,7 +320,7 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
             )
                 : Container(
               height: height * 0.040,
-              width: width * 0.250,
+              width: width * 0.220,
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.blueColor, width: 1.5),
                 borderRadius: BorderRadius.circular(8),

@@ -73,11 +73,11 @@ class HomeServicesScreen extends StatelessWidget {
               floating: true,
               pinned: true,
               leading: const Icon(Icons.arrow_back),
-              actions: const [
+              actions:  [
                 Icon(Icons.phone),
-                SizedBox(width: 10),
+                SizedBox(width:width*0.050),
                 Icon(Icons.notifications),
-                SizedBox(width: 10),
+                SizedBox(width:width*0.050),
               ],
             ),
             SliverPersistentHeader(
@@ -87,9 +87,9 @@ class HomeServicesScreen extends StatelessWidget {
             ),
             SliverList(
               delegate: SliverChildListDelegate([
-                const SizedBox(height: 24),
+                 SizedBox(height:height*0.024),
                 const ServiceList(),
-                const SizedBox(height: 24),
+                SizedBox(height:height*0.024),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(

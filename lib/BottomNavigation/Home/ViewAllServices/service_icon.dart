@@ -26,7 +26,7 @@ class ServiceIcon extends StatelessWidget {
             child: Icon(icon, color: AppColors.blueShade, size: 30),
           ),
         ),
-        const SizedBox(height: 5),
+         SizedBox(height: height*0.010),
         Text(name, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12)),
       ],
     );

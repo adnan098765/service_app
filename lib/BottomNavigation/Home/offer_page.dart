@@ -48,13 +48,13 @@ class OfferBanner extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: Text(
+                    child: CustomText(text:
                       'BOOK NOW',
-                      style: TextStyle(
-                        color: Colors.white,
+
+                        color: AppColors.whiteTheme,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                      ),
+
                     ),
                   ),
                 ],

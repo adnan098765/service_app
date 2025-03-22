@@ -47,7 +47,7 @@ class MaintenanceBanner extends StatelessWidget {
                 ],
               ),
             ),
-            Image.asset('assets/images/img.png', height: 50),
+            Image.asset('assets/images/img.png', height: height*0.060),
           ],
         ),
       ),

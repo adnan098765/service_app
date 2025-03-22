@@ -71,8 +71,6 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                   ),
                 ),
                 SizedBox(height: height * 0.020),
-
-                // Gender Dropdown
                 DropdownButtonFormField<String>(
                   value: selectedGender,
                   decoration: InputDecoration(
@@ -172,7 +170,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                   ),
                 ),
                 Image(image: AssetImage("assets/images/img_2.png"), height: height * 0.3, width: width),
-                SizedBox(height: height * 0.050), // Replaced Spacer() with SizedBox
+                SizedBox(height: height * 0.050),
                 Center(
                   child: CustomText(
                     text: "By Continuing, you agree to our company's ",

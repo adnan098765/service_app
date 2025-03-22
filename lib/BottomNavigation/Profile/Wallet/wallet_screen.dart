@@ -25,7 +25,7 @@ class _WalletScreenState extends State<WalletScreen> {
       ),
       body: Container(
         margin: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-        height: height*0.19,
+        height: height*0.20,
         width: width,
         decoration: BoxDecoration(
           color: AppColors.blackColor,

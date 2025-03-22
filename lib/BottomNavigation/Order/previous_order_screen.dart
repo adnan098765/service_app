@@ -1,44 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled2/AppColors/app_colors.dart';
-import 'package:untitled2/BottomNavigation/Home/ViewAllServices/home_services_screen.dart';
 
-class OrdersScreen extends StatelessWidget {
-  const OrdersScreen({super.key});
+import '../Home/ViewAllServices/home_services_screen.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        backgroundColor: AppColors.whiteTheme,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          bottom: const TabBar(
-            labelColor: Colors.blue,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: Colors.blue,
-            tabs: [
-              Tab(text: "Active"),
-              Tab(text: "Previous"),
-              Tab(text: "Scheduled"),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            const NoOrderScreen(),  // Active Orders
-            Center(child: Text("Previous Orders", style: TextStyle(fontSize: 18))),
-            Center(child: Text("Scheduled Orders", style: TextStyle(fontSize: 18))),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class NoOrderScreen extends StatelessWidget {
-  const NoOrderScreen({super.key});
+class PreviousOrderScreen extends StatelessWidget {
+  const PreviousOrderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
