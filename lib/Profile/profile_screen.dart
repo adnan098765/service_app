@@ -84,6 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Container(
                     margin: EdgeInsets.only(top: 30),
                     height: height * 0.170,
+
                     decoration: BoxDecoration(
                       color: AppColors.blackColor,
                       borderRadius: BorderRadius.circular(20),
@@ -97,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Container(
                               width:width*0.3,
-                              height: height*0.120,
+                              height: height*0.130,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: Colors.grey.shade800,

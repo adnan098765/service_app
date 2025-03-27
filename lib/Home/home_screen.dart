@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/widgets/custom_text.dart';
+import '../Profile/Account/account_screen.dart';
+import '../Profile/profile_screen.dart';
 import 'ViewAllServices/home_services_screen.dart';
 import 'categories_page.dart';
 import 'maintenance_page.dart';
 import 'offer_page.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -85,10 +94,11 @@ class HomeScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    // AccountScreen()
                   ],
                 ),
               ),
-              // Add your drawer items here
+              ProfileScreen(), // Add your drawer items here
             ],
           ),
         ),
@@ -114,10 +124,7 @@ class HomeScreen extends StatelessWidget {
                   SizedBox(height: 5),
                   Text(
                     'Find the best services for your needs',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -149,11 +156,15 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => HomeServicesScreen()),
+                          builder: (context) => HomeServicesScreen(),
+                        ),
                       );
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.blue[50],
                         borderRadius: BorderRadius.circular(20),

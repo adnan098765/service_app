@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 
@@ -79,8 +78,8 @@ class ServiceCard extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Container(
-      height: height*0.148,
-      width: width*0.800,
+      height: height * 0.150,
+      width: width * 0.800,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.appColor,
@@ -89,21 +88,34 @@ class ServiceCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            height: height*0.110,
-            width: width*0.250,
+            height: height * 0.110,
+            width: width * 0.250,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              image: DecorationImage(image: AssetImage("assets/images/img.png",),fit: BoxFit.cover )
+              image: DecorationImage(
+                image: AssetImage("assets/images/img.png"),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
 
-           SizedBox(width:width*0.020),
+          SizedBox(width: width * 0.020),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                Text(description, style: const TextStyle(color: Colors.white70)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: const TextStyle(color: Colors.white70),
+                ),
                 Row(
                   children: [
                     Text(
@@ -113,7 +125,7 @@ class ServiceCard extends StatelessWidget {
                         decoration: TextDecoration.lineThrough,
                       ),
                     ),
-                     SizedBox(width:width*0.015),
+                    SizedBox(width: width * 0.015),
                     Text(
                       discountedPrice,
                       style: const TextStyle(

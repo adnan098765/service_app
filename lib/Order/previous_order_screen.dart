@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 
@@ -10,7 +9,8 @@ class PreviousOrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: SizedBox.expand(  // Ensure full height
+      child: SizedBox.expand(
+        // Ensure full height
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -23,19 +23,33 @@ class PreviousOrderScreen extends StatelessWidget {
             ),
             SizedBox(
               height: 150,
-              child: Image.asset('assets/images/img.png', fit: BoxFit.contain), // Use a relevant image
+              child: Image.asset(
+                'assets/images/img.png',
+                fit: BoxFit.contain,
+              ), // Use a relevant image
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeServicesScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeServicesScreen()),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.buttonColor,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              child: const Text("Book Now", style: TextStyle(color: Colors.white, fontSize: 16)),
+              child: const Text(
+                "Book Now",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
             ),
           ],
         ),

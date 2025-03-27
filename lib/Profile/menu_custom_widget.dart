@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 
@@ -18,15 +17,16 @@ class MenuTile extends StatelessWidget {
       children: [
         ListTile(
           leading: CustomContainer(
-              height: height*0.032,
-              width: width*0.083,
-                color: AppColors.blackColor,
-                borderRadius: 5,
-              child: Icon(icon, color: Colors.white)),
+            height: height * 0.032,
+            width: width * 0.083,
+            color: AppColors.blackColor,
+            borderRadius: 5,
+            child: Icon(icon, color: Colors.white),
+          ),
           title: Text(title, style: const TextStyle(fontSize: 16)),
           trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         ),
-        Divider()
+        Divider(),
       ],
     );
   }

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/widgets/custom_text.dart';
@@ -25,10 +24,10 @@ class _PaymentMethodState extends State<PaymentMethod> {
             children: [
               Icon(Icons.payment),
               SizedBox(width: 8),
-              Text("Payment Methods",style: TextStyle(fontSize: 14),),
+              Text("Payment Methods", style: TextStyle(fontSize: 14)),
               Spacer(),
               IconButton(
-                icon: Icon(Icons.close,size: 20,),
+                icon: Icon(Icons.close, size: 20),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -56,7 +55,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
                           isCheckedCash = value!;
                           if (isCheckedCash) {
                             selectedPaymentMethod = "Cash";
-                            isCheckedCardBank = false; 
+                            isCheckedCardBank = false;
                           }
                         });
                       },
@@ -97,8 +96,11 @@ class _PaymentMethodState extends State<PaymentMethod> {
                   ],
                 ),
                 SizedBox(height: 8),
-                Image(image: AssetImage("assets/images/payment.jpeg"),height: 20,width: 100,)
-
+                Image(
+                  image: AssetImage("assets/images/payment.jpeg"),
+                  height: 20,
+                  width: 100,
+                ),
               ],
             ),
           ),
@@ -140,7 +142,11 @@ class _PaymentMethodState extends State<PaymentMethod> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.payment, size: 16, color: AppColors.darkBlueShade),
+                      Icon(
+                        Icons.payment,
+                        size: 16,
+                        color: AppColors.darkBlueShade,
+                      ),
                       SizedBox(width: width * 0.020),
                       CustomText(
                         text: "Payment Method",
@@ -155,11 +161,16 @@ class _PaymentMethodState extends State<PaymentMethod> {
                       Icon(Icons.money, size: 14, color: Colors.green),
                       SizedBox(width: width * 0.020),
                       CustomText(
-                        text: selectedPaymentMethod, // Display selected payment method
+                        text:
+                            selectedPaymentMethod, // Display selected payment method
                         fontSize: 12,
                       ),
                       Spacer(),
-                      Icon(Icons.edit, size: 16, color: AppColors.darkBlueShade),
+                      Icon(
+                        Icons.edit,
+                        size: 16,
+                        color: AppColors.darkBlueShade,
+                      ),
                     ],
                   ),
                 ],
@@ -184,7 +195,11 @@ class _PaymentMethodState extends State<PaymentMethod> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.wallet, size: 14, color: AppColors.darkBlueShade),
+                      Icon(
+                        Icons.wallet,
+                        size: 14,
+                        color: AppColors.darkBlueShade,
+                      ),
                       SizedBox(width: width * 0.020),
                       CustomText(
                         text: "Use wallet",

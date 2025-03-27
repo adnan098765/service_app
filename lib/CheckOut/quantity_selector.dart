@@ -8,10 +8,10 @@ class QuantitySelector extends StatefulWidget {
   final Function(int) onQuantityChanged;
 
   const QuantitySelector({
-    Key? key,
+    super.key,
     required this.count,
     required this.onQuantityChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<QuantitySelector> createState() => _QuantitySelectorState();
@@ -46,20 +46,13 @@ class _QuantitySelectorState extends State<QuantitySelector> {
                 color: AppColors.buttonColor,
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(
-                Icons.remove,
-                color: Colors.white,
-                size: 20,
-              ),
+              child: const Icon(Icons.remove, color: Colors.white, size: 20),
             ),
           ),
           SizedBox(width: width * 0.029),
           Text(
             '${widget.count}',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           Spacer(),
           InkWell(
@@ -74,11 +67,7 @@ class _QuantitySelectorState extends State<QuantitySelector> {
                 color: AppColors.buttonColor,
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 20,
-              ),
+              child: const Icon(Icons.add, color: Colors.white, size: 20),
             ),
           ),
         ],

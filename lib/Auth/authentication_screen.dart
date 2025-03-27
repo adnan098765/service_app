@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/Auth/otp_screen.dart';
-import 'package:untitled2/widgets/custom_container.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 
 class AuthenticationScreen extends StatefulWidget {
@@ -36,7 +35,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                   text: "Welcome to our company",
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.appColor
+                  color: AppColors.appColor,
                 ),
 
                 SizedBox(height: 8),
@@ -88,7 +87,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: height*0.025,),
+                SizedBox(height: height * 0.025),
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -160,23 +159,24 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                           width: 1.5,
                         ),
                       ),
-                      prefixIcon: Icon(Icons.person_outline, color: Colors.grey[600]),
+                      prefixIcon: Icon(
+                        Icons.person_outline,
+                        color: Colors.grey[600],
+                      ),
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 15,
                         vertical: 2,
                       ),
                     ),
                     dropdownColor: Colors.grey[200],
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
-                    items: ["Male", "Female", "Other"].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
+                    items:
+                        ["Male", "Female", "Other"].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                     onChanged: (newValue) {
                       setState(() {
                         selectedGender = newValue!;
@@ -250,22 +250,22 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.blackColor,
                         borderRadius: BorderRadius.circular(15),
-                        boxShadow: _buttonPressed
-                            ? []
-                            : [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
+                        boxShadow:
+                            _buttonPressed
+                                ? []
+                                : [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
                             AppColors.buttonColor,
                             AppColors.buttonColor,
-
                           ],
                         ),
                       ),
@@ -288,10 +288,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 18.0),
                     child: RichText(
                       text: TextSpan(
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                         children: [
                           TextSpan(text: "By continuing, you agree to our "),
                           TextSpan(
@@ -314,7 +311,6 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: height * 0.02),
               ],
             ),

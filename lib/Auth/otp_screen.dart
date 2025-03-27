@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 import '../BottomNavBar/bottom_nav_screen.dart';
-import '../widgets/custom_container.dart';
+import '../google_map/map_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -137,20 +137,29 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.appColor, width: 2),
+                      borderSide: BorderSide(
+                        color: AppColors.appColor,
+                        width: 2,
+                      ),
                     ),
                     hintText: "Enter 6-digit OTP",
                     hintStyle: TextStyle(color: Colors.grey[500]),
                     contentPadding: EdgeInsets.symmetric(vertical: 18),
-                    prefixIcon: Icon(Icons.lock_outline, color: AppColors.appColor),
+                    prefixIcon: Icon(
+                      Icons.lock_outline,
+                      color: AppColors.appColor,
+                    ),
                     suffixIcon: InkWell(
                       onTap: resendOTP,
                       child: Padding(
-                        padding: const EdgeInsets.only(right: 12,top: 12),
+                        padding: const EdgeInsets.only(right: 12, top: 12),
                         child: Text(
                           isResendEnabled ? "Resend" : "$_secondsRemaining s",
                           style: TextStyle(
-                            color: isResendEnabled ? AppColors.appColor : AppColors.greyColor,
+                            color:
+                                isResendEnabled
+                                    ? AppColors.appColor
+                                    : AppColors.greyColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -166,9 +175,7 @@ class _OtpScreenState extends State<OtpScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-
-                  },
+                  onPressed: () {},
                   child: CustomText(
                     text: "Send code via Email?",
                     fontSize: 14,
@@ -190,7 +197,9 @@ class _OtpScreenState extends State<OtpScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => BottomNavScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => BottomNavScreen(),
+                      ),
                     );
                   },
                   child: AnimatedContainer(
@@ -200,22 +209,20 @@ class _OtpScreenState extends State<OtpScreen> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       gradient: LinearGradient(
-                        colors: [
-                          AppColors.buttonColor,
-                          AppColors.buttonColor,
-                        ],
+                        colors: [AppColors.buttonColor, AppColors.buttonColor],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      boxShadow: _isButtonPressed
-                          ? []
-                          : [
-                        BoxShadow(
-                          color: AppColors.buttonColor.withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
+                      boxShadow:
+                          _isButtonPressed
+                              ? []
+                              : [
+                                BoxShadow(
+                                  color: AppColors.buttonColor.withOpacity(0.3),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
                     ),
                     child: Center(
                       child: CustomText(

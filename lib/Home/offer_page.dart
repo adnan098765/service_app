@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 
@@ -48,13 +47,12 @@ class OfferBanner extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: CustomText(text:
-                      'BOOK NOW',
+                    child: CustomText(
+                      text: 'BOOK NOW',
 
-                        color: AppColors.whiteTheme,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-
+                      color: AppColors.whiteTheme,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],

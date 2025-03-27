@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../AppColors/app_colors.dart';
+import 'ViewAllServices/AcServiceDetails/ac_service_detail_screen.dart';
 
 class CategoriesGrid extends StatefulWidget {
   const CategoriesGrid({super.key});
@@ -12,13 +13,56 @@ class _CategoriesGridState extends State<CategoriesGrid> {
   int? _selectedIndex;
 
   final List<Map<String, dynamic>> categories = [
-    {'icon': Icons.format_paint, 'label': 'Painting'},
-    {'icon': Icons.cleaning_services, 'label': 'Cleaning'},
-    {'icon': Icons.local_shipping, 'label': 'Van'},
-    {'icon': Icons.build, 'label': 'Repair'},
-    {'icon': Icons.engineering, 'label': 'Labour'},
-    {'icon': Icons.plumbing, 'label': 'Plumbing'},
+    {'icon': Icons.format_paint, 'label': 'Painting', 'route': '/painting'},
+    {
+      'icon': Icons.cleaning_services,
+      'label': 'Cleaning',
+      'route': '/cleaning',
+    },
+    {'icon': Icons.local_shipping, 'label': 'Van', 'route': '/van'},
+    {'icon': Icons.build, 'label': 'Repair', 'route': '/repair'},
+    {'icon': Icons.engineering, 'label': 'Labour', 'route': '/labour'},
+    {'icon': Icons.plumbing, 'label': 'Plumbing', 'route': '/plumbing'},
   ];
+
+  void _navigate(BuildContext context, int index) {
+    final route = categories[index]['route'];
+
+    // You can replace this with your actual navigation logic
+    // For now, it just shows which category was selected
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Navigating to ${categories[index]['label']}'),
+        duration: Duration(milliseconds: 500),
+      ),
+    );
+
+    // Example of actual navigation:
+    // Navigator.pushNamed(context, route);
+
+    // Or if you have separate screens:
+
+    switch(index) {
+      case 0:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ACServiceScreen()));
+        break;
+      case 1:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ACServiceScreen()));
+      case 2:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ACServiceScreen()));
+      case 3:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ACServiceScreen()));
+      case 4:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ACServiceScreen()));
+      case 5:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ACServiceScreen()));
+
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => CleaningScreen()));
+        break;
+      // Add cases for other categories
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +88,7 @@ class _CategoriesGridState extends State<CategoriesGrid> {
               setState(() {
                 _selectedIndex = index;
               });
+              _navigate(context, index);
             },
             child: Container(
               decoration: BoxDecoration(
@@ -57,13 +102,14 @@ class _CategoriesGridState extends State<CategoriesGrid> {
                     offset: Offset(0, 3),
                   ),
                 ],
-                gradient: isSelected
-                    ? LinearGradient(
-                  colors: [AppColors.appColor, AppColors.darkBlueShade],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-                    : null,
+                gradient:
+                    isSelected
+                        ? LinearGradient(
+                          colors: [AppColors.appColor, AppColors.darkBlueShade],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                        : null,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -71,7 +117,7 @@ class _CategoriesGridState extends State<CategoriesGrid> {
                   Icon(
                     categories[index]['icon'],
                     color: isSelected ? Colors.white : AppColors.appColor,
-                    size: 35,
+                    size: height * 0.045,
                   ),
                   SizedBox(height: height * 0.010),
                   Text(
@@ -79,7 +125,7 @@ class _CategoriesGridState extends State<CategoriesGrid> {
                     style: TextStyle(
                       color: isSelected ? Colors.white : AppColors.appColor,
                       fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                       fontSize: 14,
                     ),
                   ),

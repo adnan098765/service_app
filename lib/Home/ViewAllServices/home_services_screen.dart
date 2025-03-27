@@ -133,7 +133,7 @@ class HomeServicesScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              width: width * 0.12,
+                              width: width * 0.52,
                               height: height * 0.06,
                               decoration: BoxDecoration(
                                 color: AppColors.blueAccentColor.withOpacity(0.1),
@@ -142,7 +142,7 @@ class HomeServicesScreen extends StatelessWidget {
                               child: Icon(
                                 services[index]['icon'],
                                 size: height * 0.03,
-                                color: AppColors.blueAccentColor,
+                                color: AppColors.appColor,
                               ),
                             ),
                             SizedBox(height: height * 0.01),

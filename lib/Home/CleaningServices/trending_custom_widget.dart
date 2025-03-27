@@ -11,7 +11,7 @@ class TrendingCustomWidget extends StatelessWidget {
   final double newPrice;
 
   const TrendingCustomWidget({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.title,
     required this.orders,
@@ -19,7 +19,7 @@ class TrendingCustomWidget extends StatelessWidget {
     required this.description,
     required this.oldPrice,
     required this.newPrice,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

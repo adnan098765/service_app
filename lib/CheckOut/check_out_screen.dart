@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:date_picker_timetable/date_picker_timetable.dart';
+import 'package:intl/intl.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/CheckOut/peament_method.dart';
 import 'package:untitled2/CheckOut/quantity_selector.dart';
@@ -9,8 +10,7 @@ import '../widgets/custom_container.dart';
 class CheckoutScreen extends StatefulWidget {
   final Map<String, int> selectedServices;
 
-  const CheckoutScreen({Key? key, required this.selectedServices})
-    : super(key: key);
+  const CheckoutScreen({super.key, required this.selectedServices});
 
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
@@ -24,14 +24,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   String _address =
       "Azeem Boys Hostel Johar View Lahore Punjab, Johar View, Lahore";
 
-  final List<String> timeSlots = [
-    "9:00 AM",
-    "9:30 AM",
-    "10:00 AM",
-    "10:30 AM",
-    "11:00 AM",
-    "11:30 AM",
-  ];
+  // Time slots will be generated dynamically from 9 AM to 10 PM
+  final List<String> timeSlots = _generateTimeSlots();
 
   final List<Map<String, String>> citiesWithAddresses = [
     {
@@ -59,6 +53,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     "Floor standing cabinet Ac general service": 1850,
   };
 
+  static List<String> _generateTimeSlots() {
+    List<String> slots = [];
+    for (int hour = 9; hour <= 22; hour++) {
+      // Add :00 slot
+      slots.add(
+        '${hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'}',
+      );
+
+      // Add :30 slot except for 10 PM
+      if (hour < 22) {
+        slots.add(
+          '${hour > 12 ? hour - 12 : hour}:30 ${hour >= 12 ? 'PM' : 'AM'}',
+        );
+      }
+    }
+    return slots;
+  }
+
   void _editAddress() {
     showModalBottomSheet(
       context: context,
@@ -80,7 +92,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 "Choose address for booking",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height:height*0.013),
+              SizedBox(height: height * 0.013),
               Expanded(
                 child: ListView.builder(
                   shrinkWrap: true,
@@ -125,25 +137,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   },
                 ),
               ),
-              SizedBox(height:height*0.014),
+              SizedBox(height: height * 0.014),
               CustomText(text: "Add New Address", color: AppColors.appColor),
-              SizedBox(height:height*0.014),
+              SizedBox(height: height * 0.014),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text(
-                  "Done",
-                  style: TextStyle(
-                    color: AppColors.whiteTheme,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.buttonColor,
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  "Done",
+                  style: TextStyle(
+                    color: AppColors.whiteTheme,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -167,7 +179,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     int totalPrice = _calculateTotalPrice();
-     double height = MediaQuery.of(context).size.height;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Checkout", style: TextStyle(color: AppColors.whiteTheme)),
@@ -182,16 +196,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildScheduleSection(),
-            SizedBox(height:height*0.024),
+            SizedBox(height: height * 0.024),
             if (_selectedDate != null) _buildTimeSlotsSection(),
-            SizedBox(height:height*0.024),
+            SizedBox(height: height * 0.024),
             _buildAddressSection(),
-            SizedBox(height:height*0.024),
+            SizedBox(height: height * 0.024),
             Text(
               "Services list",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height:height*0.014),
+            SizedBox(height: height * 0.014),
             ...widget.selectedServices.entries.map((entry) {
               return ServiceCard(
                 title: entry.key,
@@ -209,14 +223,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   });
                 },
               );
-            }).toList(),
-            SizedBox(height:height*0.024),
+            }),
+            SizedBox(height: height * 0.024),
             // PaymentMethod(),
-            SizedBox(height:height*0.014),
+            SizedBox(height: height * 0.014),
             _buildTotalPriceSection(totalPrice),
-            SizedBox(height:height*0.024),
+            SizedBox(height: height * 0.024),
             CustomContainer(
-              height: height*0.060,
+              height: height * 0.060,
               width: double.infinity,
               color: AppColors.darkBlueShade,
               borderRadius: 15,
@@ -238,6 +252,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget _buildScheduleSection() {
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
+    final DateTime today = DateTime.now();
+    final DateTime endDate = DateTime(today.year, today.month + 2, today.day);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -247,11 +264,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               "Selected schedule",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(width: w*0.014),
+            SizedBox(width: w * 0.014),
             _selectedDate != null && _selectedTime != null
-                ? Text(
-                  "$_selectedTime, ${_selectedDate!.day}-${_selectedDate!.month}-${_selectedDate!.year}",
-                  style: TextStyle(color: AppColors.appColor),
+                ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateFormat(
+                        'MMMM',
+                        'en_US',
+                      ).format(_selectedDate!), // English month name
+                      style: TextStyle(color: AppColors.appColor, fontSize: 14),
+                    ),
+                    Text(
+                      DateFormat(
+                        'EEEE',
+                        'en_US',
+                      ).format(_selectedDate!), // English day name
+                      style: TextStyle(color: AppColors.appColor, fontSize: 12),
+                    ),
+                    Text(
+                      "$_selectedTime, ${_selectedDate!.day}-${_selectedDate!.month}-${_selectedDate!.year}",
+                      style: TextStyle(color: AppColors.appColor, fontSize: 12),
+                    ),
+                  ],
                 )
                 : Text(
                   "No date/time selected",
@@ -259,10 +295,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
           ],
         ),
-        SizedBox(height:h*0.024),
+        SizedBox(height: h * 0.024),
         Container(
-          height: MediaQuery.of(context).size.height * 0.12,
-          width: MediaQuery.of(context).size.width,
+          height: h * 0.143,
+          width: w,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey.shade300),
@@ -278,12 +314,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
           child: DatePicker(
             DateTime.now(),
-            width: w*0.180,
-            height: h*0.090,
+            width: w * 0.180,
+            height: h * 0.090,
             initialSelectedDate: _selectedDate,
             selectionColor: AppColors.appColor,
             selectedTextColor: AppColors.whiteTheme,
-            daysCount: 60,
+            daysCount: endDate.difference(today).inDays + 1,
+            dateTextStyle: TextStyle(
+              fontWeight: FontWeight.normal,
+              color: Colors.black,
+            ),
+            dayTextStyle: TextStyle(
+              fontWeight: FontWeight.normal,
+              color: Colors.black,
+            ),
+            monthTextStyle: TextStyle(
+              fontWeight: FontWeight.normal,
+              color: Colors.black,
+            ),
             onDateChange: (date) {
               setState(() {
                 _selectedDate = date;
@@ -300,12 +348,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget _buildTimeSlotsSection() {
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: h*0.014),
+        SizedBox(height: h * 0.014),
         Container(
-          height: h*0.0750,
+          height: h * 0.0750,
           width: w,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -370,6 +419,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _buildAddressSection() {
+    double h = MediaQuery.of(context).size.height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -414,18 +464,51 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Row(
+        child: Column(
           children: [
-            CustomText(
-              text: "Total Price",
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-            Spacer(),
-            CustomText(
-              text: "Rs. $totalPrice",
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            // List all selected services with their quantities and prices
+            ...widget.selectedServices.entries.map((entry) {
+              final serviceName = entry.key;
+              final quantity = entry.value;
+              final price = servicePrices[serviceName] ?? 0;
+              final total = price * quantity;
+
+              return Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomText(text: serviceName, fontSize: 14),
+                      ),
+                      CustomText(
+                        text: "$quantity × Rs. $price = Rs. $total",
+                        fontSize: 14,
+                      ),
+                    ],
+                  ),
+                  if (entry.key != widget.selectedServices.entries.last.key)
+                    Divider(),
+                ],
+              );
+            }),
+
+            Divider(thickness: 2),
+
+            // Total price row
+            Row(
+              children: [
+                CustomText(
+                  text: "Total Price",
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                Spacer(),
+                CustomText(
+                  text: "Rs. $totalPrice",
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ],
             ),
           ],
         ),
@@ -444,7 +527,7 @@ class ServiceCard extends StatelessWidget {
   final Function(int) onQuantityChanged;
 
   const ServiceCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.originalPrice,
@@ -452,7 +535,7 @@ class ServiceCard extends StatelessWidget {
     required this.rating,
     required this.count,
     required this.onQuantityChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -486,10 +569,7 @@ class ServiceCard extends StatelessWidget {
                   ),
                   Text(
                     description,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.appColor,
-                    ),
+                    style: TextStyle(fontSize: 14, color: AppColors.appColor),
                   ),
                   SizedBox(height: 10),
                   Row(

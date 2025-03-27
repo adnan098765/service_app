@@ -5,9 +5,13 @@ import '../Home/home_screen.dart';
 import '../Order/order_tabbar.dart';
 import '../Profile/profile_screen.dart';
 
-
 class BottomNavScreen extends StatefulWidget {
-  const BottomNavScreen({super.key});
+  const BottomNavScreen({
+    super.key,
+    // required double latitude,
+    // required double longitude,
+    // String? address,
+  });
 
   @override
   _BottomNavScreenState createState() => _BottomNavScreenState();
@@ -47,10 +51,12 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.home, size: 28), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.list, size: 28), label: ''),
           // BottomNavigationBarItem(icon: Icon(Icons.message, size: 28), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person, size: 28), label: ''),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, size: 28),
+            label: '',
+          ),
         ],
       ),
     );
   }
 }
-

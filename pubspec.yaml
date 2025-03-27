@@ -40,7 +40,23 @@ dependencies:
   permission_handler: ^11.4.0
   date_picker_timetable: ^0.0.5
   table_calendar: 3.1.3
+  geolocator:
+  google_maps_flutter:
+  google_places_autocomplete_text_field: ^1.1.0
+  responsive_sizer:
+#  flutter_google_places_sdk: ^0.3.0
+#  flutter_google_places_sdk_platform_interface: ^0.2.8
+  flutter_google_places_sdk_http: ^0.1.1
+  flutter_google_places_sdk_windows: ^0.1.1
+  flutter_google_places_sdk:
+#  google_maps_webservice:
+
+  flutter_date_pickers: ^0.4.3
+  get:
+  dio:
   intl:
+  geocoding: ^3.0.0
+  google_places_flutter: ^2.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

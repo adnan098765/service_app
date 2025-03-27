@@ -3,6 +3,8 @@ import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 
 class MaintenanceBanner extends StatelessWidget {
+  const MaintenanceBanner({super.key});
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -47,7 +49,7 @@ class MaintenanceBanner extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 overflow: TextOverflow.ellipsis,
-                                color: AppColors.whiteTheme
+                                color: AppColors.whiteTheme,
                               ),
                             ),
                             // child: CustomText(
@@ -77,7 +79,7 @@ class MaintenanceBanner extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 overflow: TextOverflow.ellipsis,
-                                color: AppColors.whiteTheme
+                                color: AppColors.whiteTheme,
                               ),
                             ),
                             // child: CustomText(

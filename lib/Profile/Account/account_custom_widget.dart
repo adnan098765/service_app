@@ -18,7 +18,9 @@ class ProfileInfoTile extends StatelessWidget {
   });
 
   void _showEditBottomSheet(BuildContext context) {
-    TextEditingController editController = TextEditingController(text: subtitle);
+    TextEditingController editController = TextEditingController(
+      text: subtitle,
+    );
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -26,14 +28,20 @@ class ProfileInfoTile extends StatelessWidget {
         double width = MediaQuery.of(context).size.width;
         return Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Container(
-            height: height*0.300,
+          child: SizedBox(
+            height: height * 0.300,
             width: width,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Edit $title", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  "Edit $title",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: editController,
@@ -85,19 +93,22 @@ class ProfileInfoTile extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           subtitle: Text(subtitle),
-          trailing: editable
-              ? GestureDetector(
-            onTap: () => _showEditBottomSheet(context),
-            child: const Icon(Icons.edit, size: 18),
-          )
-              : isNavigation
-              ? const Icon(Icons.arrow_forward_ios, size: 16)
-              : null,
+          trailing:
+              editable
+                  ? GestureDetector(
+                    onTap: () => _showEditBottomSheet(context),
+                    child: const Icon(Icons.edit, size: 18),
+                  )
+                  : isNavigation
+                  ? const Icon(Icons.arrow_forward_ios, size: 16)
+                  : null,
         ),
-        Divider(thickness: 2,)
-
+        Divider(thickness: 2),
       ],
     );
   }
