@@ -10,7 +10,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
   late Animation<double> _scaleAnimation;
@@ -26,31 +27,22 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
 
     // Fade in animation
-    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeIn,
-      ),
-    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     // Scale animation
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.elasticOut,
-      ),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
     // Text slide animation
     _textSlideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.5),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.decelerate,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.decelerate));
 
     _controller.forward();
 
@@ -118,11 +110,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         shadows: [
-                        Shadow(
-                        blurRadius: 10,
-                        color: Colors.black.withOpacity(0.5),
-                        offset: Offset(2, 2),
-                        )
+                          Shadow(
+                            blurRadius: 10,
+                            color: Colors.black.withOpacity(0.5),
+                            offset: Offset(2, 2),
+                          ),
                         ],
                       ),
                     ),

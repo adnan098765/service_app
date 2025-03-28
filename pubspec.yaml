@@ -50,7 +50,7 @@ dependencies:
   flutter_google_places_sdk_windows: ^0.1.1
   flutter_google_places_sdk:
 #  google_maps_webservice:
-
+  pinput: ^5.0.1
   flutter_date_pickers: ^0.4.3
   get:
   dio:

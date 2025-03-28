@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/Auth/otp_screen.dart';
+import 'package:untitled2/google_map/map_screen.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 
 class AuthenticationScreen extends StatefulWidget {
@@ -119,7 +120,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       ),
                       hintText: "Enter your full name",
                       hintStyle: TextStyle(color: Colors.grey[600]),
-                      prefixIcon: Icon(Icons.phone, color: Colors.grey[600]),
+                      prefixIcon: Icon(Icons.person, color: Colors.grey[600]),
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 15,
                         horizontal: 15,
@@ -240,7 +241,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => OtpScreen()),
+                        MaterialPageRoute(builder: (context) => CombinedLocationScreen()),
                       );
                     },
                     child: AnimatedContainer(

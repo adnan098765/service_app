@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/widgets/custom_text.dart';
-import '../Profile/Account/account_screen.dart';
-import '../Profile/profile_screen.dart';
-import 'ViewAllServices/home_services_screen.dart';
 import 'categories_page.dart';
 import 'maintenance_page.dart';
 import 'offer_page.dart';
+import 'ViewAllServices/home_services_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final double latitude;
+  final double longitude;
+  final String? address;
+  final String? city;
+  final bool isManualLocation;
+
+  const HomeScreen({
+    super.key,
+    required this.latitude,
+    required this.longitude,
+    this.address,
+    this.city,
+    required this.isManualLocation,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -22,86 +34,53 @@ class _HomeScreenState extends State<HomeScreen> {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: AppColors.lightGrey,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: EdgeInsets.only(top: 20),
-            child: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              title: const Text(
-                'Home',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  widget.isManualLocation ? Icons.location_on : Icons.my_location,
+                  size: 20,
+                  color: AppColors.darkBlueShade,
                 ),
-              ),
-              centerTitle: true,
-              actions: [
-                Padding(
-                  padding: EdgeInsets.only(right: 16),
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.blue[100],
-                    backgroundImage: AssetImage('assets/images/img.png'),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(
+                        text: widget.city ?? 'Current Location',
+                        fontWeight: FontWeight.w600,
+                      ),
+                      CustomText(
+                        text: widget.address ?? 'Address not available',
+                        fontSize: 12.px,
+                        color: AppColors.hintGrey,
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
+          ],
         ),
-      ),
-      drawer: Drawer(
-        child: Container(
-          color: Colors.white,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.blue[800]!, Colors.blue[600]!],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: AssetImage('assets/images/img.png'),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'Welcome User',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    // AccountScreen()
-                  ],
-                ),
-              ),
-              ProfileScreen(), // Add your drawer items here
-            ],
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              // Navigate to notifications
+            },
           ),
-        ),
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              // Navigate to cart
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -130,7 +109,22 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Offer Banner
+            // Location Type Indicator
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 20),
+            //   child: Chip(
+            //     label: Text(
+            //       widget.isManualLocation ? 'Manual Location' : 'Current Location',
+            //       style: TextStyle(color: Colors.white),
+            //     ),
+            //     backgroundColor: widget.isManualLocation
+            //         ? Colors.orange
+            //         : Colors.green,
+            //   ),
+            // ),
+            SizedBox(height: 10),
+
+            // Rest of your home screen content...
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: OfferBanner(),
@@ -213,71 +207,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-// Enhanced OfferBanner widget (you should update your actual OfferBanner similarly)
-// class OfferBanner extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       height: 150,
-//       width: double.infinity,
-//       decoration: BoxDecoration(
-//         borderRadius: BorderRadius.circular(12),
-//         gradient: LinearGradient(
-//           colors: [Colors.orange[600]!, Colors.orange[400]!],
-//           begin: Alignment.topLeft,
-//           end: Alignment.bottomRight,
-//         ),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.orange.withOpacity(0.3),
-//             blurRadius: 10,
-//             offset: Offset(0, 5),
-//           ),
-//         ],
-//       ),
-//       child: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               "Special Offer",
-//               style: TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 20,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             SizedBox(height: 8),
-//             Text(
-//               "Get 20% off on your first service",
-//               style: TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 16,
-//               ),
-//             ),
-//             Spacer(),
-//             Align(
-//               alignment: Alignment.bottomRight,
-//               child: Container(
-//                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-//                 decoration: BoxDecoration(
-//                   color: Colors.white,
-//                   borderRadius: BorderRadius.circular(20),
-//                 ),
-//                 child: Text(
-//                   "Claim Now",
-//                   style: TextStyle(
-//                     color: Colors.orange[800],
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
