@@ -11,7 +11,7 @@ import '../AppColors/app_colors.dart';
 import '../BottomNavBar/bottom_nav_screen.dart';
 
 class CombinedLocationScreen extends StatefulWidget {
-  const CombinedLocationScreen({super.key});
+  const CombinedLocationScreen({super.key, required Null Function(dynamic location, dynamic address) onSelect});
 
   @override
   State<CombinedLocationScreen> createState() => _CombinedLocationScreenState();

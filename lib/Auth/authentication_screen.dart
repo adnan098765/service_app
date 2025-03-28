@@ -241,7 +241,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => CombinedLocationScreen()),
+                        MaterialPageRoute(builder: (context) => CombinedLocationScreen(onSelect: (location, address) {  },)),
                       );
                     },
                     child: AnimatedContainer(
