@@ -16,9 +16,12 @@ class _EnterPhoneNumberState extends State<EnterPhoneNumber> {
   final TextEditingController phoneNumberController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  bool _isValidPhoneNumber(String phone) {
-    final regex = RegExp(r'^03\d{9}$');
-    return regex.hasMatch(phone);
+  bool isPhoneValid = false;
+
+  void _onPhoneChanged(String value) {
+    setState(() {
+      isPhoneValid = value.length == 10;
+    });
   }
 
   @override
@@ -48,6 +51,8 @@ class _EnterPhoneNumberState extends State<EnterPhoneNumber> {
                     fontSize: 16,
                   ),
                   SizedBox(height: height * 0.040),
+
+                  // Phone Input
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -62,17 +67,18 @@ class _EnterPhoneNumberState extends State<EnterPhoneNumber> {
                     ),
                     child: TextFormField(
                       controller: phoneNumberController,
-                      keyboardType: TextInputType.phone,
+                      keyboardType: TextInputType.number,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(11),
+                        LengthLimitingTextInputFormatter(10),
                       ],
+                      onChanged: _onPhoneChanged,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter phone number';
                         }
-                        if (!_isValidPhoneNumber(value)) {
-                          return 'Please enter valid 11-digit phone number';
+                        if (value.length != 10) {
+                          return 'Enter valid 10-digit number';
                         }
                         return null;
                       },
@@ -90,9 +96,29 @@ class _EnterPhoneNumberState extends State<EnterPhoneNumber> {
                             width: 1.5,
                           ),
                         ),
-                        hintText: "03XX XXXXXXX",
+                        hintText: "3XX XXXXXXX",
                         hintStyle: TextStyle(color: Colors.grey[600]),
-                        prefixIcon: Icon(Icons.phone, color: Colors.grey[600]),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(left: 10, right: 5),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                'assets/images/img_3.png',
+                                width: 30,
+                                height: 30,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                '+92',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 15,
                           horizontal: 15,
@@ -101,23 +127,27 @@ class _EnterPhoneNumberState extends State<EnterPhoneNumber> {
                     ),
                   ),
                   SizedBox(height: height * 0.020),
-                  InkWell(
-                    onTap: () {
+
+                  // Continue Button
+                  GestureDetector(
+                    onTap: isPhoneValid
+                        ? () {
                       if (_formKey.currentState!.validate()) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => OtpScreen(
-                              phoneNumber: phoneNumberController.text,
+                              phoneNumber: '+92${phoneNumberController.text}',
                             ),
                           ),
                         );
                       }
-                    },
+                    }
+                        : null,
                     child: CustomContainer(
                       height: height * 0.0550,
                       width: width,
-                      color: AppColors.buttonColor,
+                      color: isPhoneValid ? AppColors.buttonColor : Colors.grey,
                       borderRadius: 15,
                       child: Center(
                         child: CustomText(
@@ -129,6 +159,7 @@ class _EnterPhoneNumberState extends State<EnterPhoneNumber> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: height * 0.050),
                   Center(
                     child: CustomText(
@@ -141,9 +172,7 @@ class _EnterPhoneNumberState extends State<EnterPhoneNumber> {
                     child: RichText(
                       text: TextSpan(
                         style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.blackColor
-                        ),
+                            fontSize: 14, color: AppColors.blackColor),
                         children: [
                           TextSpan(
                             text: 'Terms & conditions ',

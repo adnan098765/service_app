@@ -98,28 +98,28 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 SizedBox(height: height * 0.02),
-                SlideTransition(
-                  position: _textSlideAnimation,
-                  child: FadeTransition(
-                    opacity: _opacityAnimation,
-                    child: Text(
-                      "Tech Bees\nEnterprises",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 10,
-                            color: Colors.black.withOpacity(0.5),
-                            offset: Offset(2, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                // SlideTransition(
+                //   position: _textSlideAnimation,
+                //   child: FadeTransition(
+                //     opacity: _opacityAnimation,
+                //     child: Text(
+                //       "Tech Bees\nEnterprises",
+                //       textAlign: TextAlign.center,
+                //       style: TextStyle(
+                //         fontSize: 28,
+                //         fontWeight: FontWeight.bold,
+                //         color: Colors.white,
+                //         shadows: [
+                //           Shadow(
+                //             blurRadius: 10,
+                //             color: Colors.black.withOpacity(0.5),
+                //             offset: Offset(2, 2),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

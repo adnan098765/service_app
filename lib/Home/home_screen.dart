@@ -187,12 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(height: height * 0.020),
-
-            // Categories Grid
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: CategoriesGrid(),
-            ),
+               CategoriesGrid(),
             SizedBox(height: height * 0.030),
 
             // Maintenance Banner

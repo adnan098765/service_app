@@ -1,43 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
-
 import 'package:untitled2/widgets/custom_container.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 
 import 'AcServiceDetails/ac_service_detail_screen.dart';
 import 'most_booked_services.dart';
 
-class HomeServicesScreen extends StatelessWidget {
-  HomeServicesScreen({super.key});
-  final TextEditingController searchController = TextEditingController();
+class HomeServicesScreen extends StatefulWidget {
+  const HomeServicesScreen({super.key});
 
-  final List<Map<String, dynamic>> services = [
-    {'name': 'AC Services', 'icon': Icons.ac_unit},
-    {'name': 'Carpenter', 'icon': Icons.handyman},
-    {'name': 'Electrician', 'icon': Icons.electrical_services},
-    {'name': 'Geyser', 'icon': Icons.water},
-    {'name': 'Handyman', 'icon': Icons.build},
-    {'name': 'Home Appliances', 'icon': Icons.kitchen},
-    {'name': 'Home Inspection', 'icon': Icons.search},
-    {'name': 'Painter', 'icon': Icons.format_paint},
-    {'name': 'Pest Control', 'icon': Icons.bug_report},
-    {'name': 'Plumber', 'icon': Icons.plumbing},
+  @override
+  State<HomeServicesScreen> createState() => _HomeServicesScreenState();
+}
+
+class _HomeServicesScreenState extends State<HomeServicesScreen> {
+  final TextEditingController searchController = TextEditingController();
+  int _selectedIndex = -1;
+
+  final List<Map<String, dynamic>> categories = [
+    {'label': 'AC Services', 'icon': Icons.ac_unit},
+    {'label': 'Carpenter', 'icon': Icons.handyman},
+    {'label': 'Electrician', 'icon': Icons.electrical_services},
+    {'label': 'Geyser', 'icon': Icons.water},
+    {'label': 'Handyman', 'icon': Icons.build},
+    {'label': 'Home Appliances', 'icon': Icons.kitchen},
+    {'label': 'Home Inspection', 'icon': Icons.search},
+    {'label': 'Painter', 'icon': Icons.format_paint},
+    {'label': 'Pest Control', 'icon': Icons.bug_report},
+    {'label': 'Plumber', 'icon': Icons.plumbing},
   ];
 
-  // Function to navigate based on index
   void _navigateTo(BuildContext context, int index) {
-    List<Widget> screens = [
-      const ACServiceScreen(),
-      const ACServiceScreen(),
-      const ACServiceScreen(),
-      const ACServiceScreen(),
-      const ACServiceScreen(),
-      const ACServiceScreen(),
-      const ACServiceScreen(),
-      const ACServiceScreen(),
-      const ACServiceScreen(),
-      const ACServiceScreen(),
-    ];
+    List<Widget> screens = List.generate(
+      categories.length,
+          (i) => const ACServiceScreen(), // Replace with actual screens
+    );
 
     if (index < screens.length) {
       Navigator.push(
@@ -49,7 +46,7 @@ class HomeServicesScreen extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => ServiceDetailsScreen(
-            serviceName: services[index]['name'],
+            serviceName: categories[index]['label'],
           ),
         ),
       );
@@ -60,6 +57,7 @@ class HomeServicesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: AppColors.whiteTheme,
       body: Padding(
@@ -71,16 +69,17 @@ class HomeServicesScreen extends StatelessWidget {
               floating: true,
               pinned: true,
               leading: InkWell(
-                  onTap: (){
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(Icons.arrow_back)),
-              actions: [
-                Icon(Icons.phone),
-                SizedBox(width: width * 0.05),
-                Icon(Icons.notifications),
-                SizedBox(width: width * 0.05),
-              ],
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const Icon(Icons.arrow_back),
+              ),
+              // actions: [
+              //   const Icon(Icons.phone),
+              //   SizedBox(width: width * 0.05),
+              //   const Icon(Icons.notifications),
+              //   SizedBox(width: width * 0.05),
+              // ],
             ),
             SliverPersistentHeader(
               pinned: true,
@@ -100,98 +99,83 @@ class HomeServicesScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: height * 0.01),
-                GridView.builder(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.04,
-                    vertical: height * 0.01,
-                  ),
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: services.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: width * 0.03,
-                    mainAxisSpacing: height * 0.02,
-                    childAspectRatio: 0.9,
-                  ),
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => _navigateTo(context, index),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: width * 0.52,
-                              height: height * 0.06,
-                              decoration: BoxDecoration(
-                                color: AppColors.blueAccentColor.withOpacity(0.1),
-                                shape: BoxShape.circle,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 0.9,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      bool isSelected = _selectedIndex == index;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                          _navigateTo(context, index);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.appColor
+                                : AppColors.whiteTheme,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
                               ),
-                              child: Icon(
-                                services[index]['icon'],
-                                size: height * 0.03,
-                                color: AppColors.appColor,
+                            ],
+                            gradient: isSelected
+                                ? LinearGradient(
+                              colors: [
+                                AppColors.appColor,
+                                AppColors.darkBlueShade
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                                : null,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                categories[index]['icon'],
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.appColor,
+                                size: height * 0.045,
                               ),
-                            ),
-                            SizedBox(height: height * 0.01),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: width * 0.01),
-                              child: Text(
-                                services[index]['name'],
-                                textAlign: TextAlign.center,
+                              SizedBox(height: height * 0.010),
+                              Text(
+                                categories[index]['label'],
                                 style: TextStyle(
-                                  fontSize: height * 0.016,
-                                  fontWeight: FontWeight.w500,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : AppColors.appColor,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  fontSize: 14,
                                 ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
                 SizedBox(height: height * 0.02),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-                  child: Card(
-                    child: InkWell(
-                      onTap: () {
-                        // Navigator.push(context, MaterialPageRoute(builder: (context)=>CleaningServiceScreen()));
-                      },
-                      child: CustomContainer(
-                        height: height * 0.07,
-                        width: width * 0.3,
-                        borderRadius: 20,
-                        color: AppColors.blueAccentColor,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CustomText(
-                              text: "Explore cleaning service",
-                              fontWeight: FontWeight.bold,
-                            ),
-                            const Icon(Icons.arrow_forward),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
                 SizedBox(height: height * 0.03),
               ]),
             ),
@@ -202,7 +186,7 @@ class HomeServicesScreen extends StatelessWidget {
   }
 }
 
-// Persistent Search Bar Delegate
+// Search Bar Delegate
 class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
   final TextEditingController controller;
 
@@ -258,7 +242,7 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;
 }
 
-// Example Service Details Screen
+// Fallback Detail Screen
 class ServiceDetailsScreen extends StatelessWidget {
   final String serviceName;
 

@@ -5,11 +5,11 @@ import 'package:untitled2/CheckOut/total_price.dart';
 import 'package:untitled2/CheckOut/schedule_section.dart';
 import 'package:untitled2/widgets/custom_container.dart';
 import 'package:untitled2/widgets/custom_text.dart';
-
 import 'address_selection.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final Map<String, int> selectedServices;
+
   const CheckoutScreen({super.key, required this.selectedServices});
 
   @override
@@ -20,19 +20,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   DateTime? _selectedDate;
   String? _selectedTime;
   String _address = "Azeem Boys Hostel Johar View Lahore Punjab";
-
-  final List<Map<String, String>> citiesWithAddresses = [
-    {
-      "city": "Lahore",
-      "area": "Johar View",
-      "address": "Azeem Boys Hostel Johar View Lahore Punjab",
-    },
-    {
-      "city": "Karachi",
-      "area": "Federal B Area",
-      "address": "New Mumbai Bakery Masoomeen Road Naseerabad Block 14",
-    },
-  ];
 
   final Map<String, int> servicePrices = {
     "AC Dismounting": 1000,
@@ -98,17 +85,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               servicePrices: servicePrices,
             ),
             SizedBox(height: 24),
-            CustomContainer(
-              height: 60,
-              width: double.infinity,
-              color: AppColors.darkBlueShade,
-              borderRadius: 15,
-              child: Center(
-                child: CustomText(
-                  text: "Place Order",
-                  color: AppColors.whiteTheme,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+            GestureDetector(
+              onTap: () {
+                // You can add the order placement logic here
+              },
+              child: CustomContainer(
+                height: 60,
+                width: double.infinity,
+                color: AppColors.darkBlueShade,
+                borderRadius: 15,
+                child: Center(
+                  child: CustomText(
+                    text: "Place Order",
+                    color: AppColors.whiteTheme,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -166,15 +158,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       isScrollControlled: true,
       builder: (context) => AddressSelectionSheet(
         currentAddress: _address,
-        savedAddresses: citiesWithAddresses,
         onSelectAddress: (address) {
-          setState(() => _address = address);
-          Navigator.pop(context);
-        },
-        onAddNewAddress: () {
-          Navigator.pop(context);
-          // Implement map selection
-        },
+          setState(() {
+            _address = address;
+          });
+        }, savedAddresses: [], onAddNewAddress: () {  },
       ),
     );
   }

@@ -30,12 +30,12 @@ class _CategoriesGridState extends State<CategoriesGrid> {
 
     // You can replace this with your actual navigation logic
     // For now, it just shows which category was selected
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Navigating to ${categories[index]['label']}'),
-        duration: Duration(milliseconds: 500),
-      ),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text('Navigating to ${categories[index]['label']}'),
+    //     duration: Duration(milliseconds: 500),
+    //   ),
+    // );
 
     // Example of actual navigation:
     // Navigator.pushNamed(context, route);

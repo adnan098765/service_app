@@ -8,15 +8,15 @@ import 'package:untitled2/AppColors/app_colors.dart';
 
 class AddressSelectionSheet extends StatefulWidget {
   final String currentAddress;
-  final List<Map<String, String>> savedAddresses;
   final Function(String) onSelectAddress;
+  final List<Map<String, String>> savedAddresses;
   final Function() onAddNewAddress;
 
   const AddressSelectionSheet({
     Key? key,
     required this.currentAddress,
-    required this.savedAddresses,
     required this.onSelectAddress,
+    required this.savedAddresses,
     required this.onAddNewAddress,
   }) : super(key: key);
 
@@ -27,13 +27,17 @@ class AddressSelectionSheet extends StatefulWidget {
 class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
   final String googleApiKey = "AIzaSyClwNhuYxVRorDGtuXSgH8bU7AaTDeJzH0";
   final TextEditingController _searchController = TextEditingController();
+
   LatLng? _selectedLocation;
   String? _selectedAddress;
   GoogleMapController? _mapController;
+  bool _manualMode = false;
 
   @override
   void initState() {
     super.initState();
+    _searchController.text = widget.currentAddress;
+    _selectedAddress = widget.currentAddress;
     _fetchCurrentLocation();
   }
 
@@ -45,6 +49,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
       _updateLocation(LatLng(position.latitude, position.longitude));
     } catch (e) {
       print('Error fetching current location: $e');
+      _updateLocation(LatLng(31.5204, 74.3587)); // Lahore default
     }
   }
 
@@ -61,22 +66,14 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
       List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
+        String addr = '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
         setState(() {
-          _selectedAddress = '${place.street}, ${place.subLocality}, '
-              '${place.locality}, ${place.postalCode}, ${place.country}';
+          _selectedAddress = addr;
+          _searchController.text = addr;
         });
       }
     } catch (e) {
       print('Error getting address: $e');
-    }
-  }
-
-  void _saveSelectedAddress() {
-    if (_selectedAddress != null && _selectedLocation != null) {
-      widget.onSelectAddress(_selectedAddress!);
-      Navigator.pop(context);
-    } else {
-      Get.snackbar('Error', 'Please select a location');
     }
   }
 
@@ -91,31 +88,45 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
       ),
       child: Column(
         children: [
-          Text(
-            "Select Address",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              Text(
+                "Select Address",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _manualMode = !_manualMode;
+                  });
+                },
+                child: Text(_manualMode ? "Use Map" : "Enter Manually"),
+              ),
+            ],
           ),
           SizedBox(height: 16),
 
-          // Improved Google Places Search
           GooglePlaceAutoCompleteTextField(
             textEditingController: _searchController,
             googleAPIKey: googleApiKey,
             inputDecoration: InputDecoration(
-              hintText: 'Search location...',
+              hintText: _manualMode ? 'Enter address manually' : 'Search location...',
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.search),
             ),
             debounceTime: 600,
             countries: ["pk"],
             isLatLngRequired: true,
-            itemClick: (prediction) {
+            // getPlaceDetailWithLatLng: true,
+            itemClick: (prediction) async {
               _searchController.text = prediction.description ?? "";
-              _searchController.selection = TextSelection.fromPosition(
-                TextPosition(offset: _searchController.text.length),
-              );
-              if (prediction.lat != null && prediction.lng != null) {
-                _updateLocation(
+              setState(() {
+                _selectedAddress = prediction.description;
+              });
+
+              if (prediction.lat != null && prediction.lng != null && !_manualMode) {
+                await _updateLocation(
                   LatLng(
                     double.parse(prediction.lat!),
                     double.parse(prediction.lng!),
@@ -124,60 +135,48 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
               }
             },
           ),
+
           SizedBox(height: 16),
 
-          Expanded(
-            child: GoogleMap(
-              onMapCreated: (controller) => _mapController = controller,
-              initialCameraPosition: CameraPosition(
-                target: _selectedLocation ?? LatLng(31.5204, 74.3587),
-                zoom: 15,
+          if (!_manualMode)
+            Expanded(
+              child: GoogleMap(
+                onMapCreated: (controller) => _mapController = controller,
+                initialCameraPosition: CameraPosition(
+                  target: _selectedLocation ?? LatLng(31.5204, 74.3587),
+                  zoom: 15,
+                ),
+                markers: _selectedLocation != null
+                    ? {
+                  Marker(
+                    markerId: MarkerId('selected_location'),
+                    position: _selectedLocation!,
+                  )
+                }
+                    : {},
+                onTap: (latLng) async {
+                  await _updateLocation(latLng);
+                },
               ),
-              markers: _selectedLocation != null
-                  ? {
-                Marker(
-                  markerId: MarkerId('selected_location'),
-                  position: _selectedLocation!,
-                )
+            ),
+          if (_manualMode) SizedBox(height: 250), // space placeholder
+
+          SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              final address = _searchController.text.trim();
+              if (address.isNotEmpty) {
+                widget.onSelectAddress(address);
+                Navigator.pop(context);
+              } else {
+                Get.snackbar('Error', 'Please enter or select an address');
               }
-                  : {},
-              onTap: _updateLocation,
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.darkBlueShade,
+              minimumSize: Size(double.infinity, 50),
             ),
-          ),
-
-          if (_selectedAddress != null) ...[
-            SizedBox(height: 16),
-            Text(
-              'Selected Address:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Text(
-              _selectedAddress!,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-
-          SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Cancel'),
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _saveSelectedAddress,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.darkBlueShade,
-                  ),
-                  child: Text('Confirm'),
-                ),
-              ),
-            ],
+            child: Text('Confirm Address', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
