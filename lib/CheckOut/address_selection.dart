@@ -31,7 +31,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
   LatLng? _selectedLocation;
   String? _selectedAddress;
   GoogleMapController? _mapController;
-  bool _manualMode = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -43,22 +43,58 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
 
   Future<void> _fetchCurrentLocation() async {
     try {
+      // Request location permissions
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        Get.snackbar('Location Disabled', 'Please enable location services');
+        _setDefaultLocation();
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Get.snackbar('Permission Denied', 'Location permissions are denied');
+          _setDefaultLocation();
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        Get.snackbar('Permission Denied', 'Location permissions are permanently denied');
+        _setDefaultLocation();
+        return;
+      }
+
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        desiredAccuracy: LocationAccuracy.best,
       );
       _updateLocation(LatLng(position.latitude, position.longitude));
     } catch (e) {
-      print('Error fetching current location: $e');
-      _updateLocation(LatLng(31.5204, 74.3587)); // Lahore default
+      print('Error fetching location: $e');
+      _setDefaultLocation();
+    } finally {
+      setState(() => _isLoading = false);
     }
+  }
+
+  void _setDefaultLocation() {
+    _updateLocation(LatLng(31.5204, 74.3587)); // Default to Lahore
   }
 
   Future<void> _updateLocation(LatLng location) async {
     setState(() {
       _selectedLocation = location;
     });
+
     await _getAddressFromLatLng(location.latitude, location.longitude);
-    _mapController?.animateCamera(CameraUpdate.newLatLng(location));
+
+    if (_mapController != null) {
+      await _mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(location, 16),
+      );
+    }
   }
 
   Future<void> _getAddressFromLatLng(double latitude, double longitude) async {
@@ -66,7 +102,14 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
       List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
-        String addr = '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+        String addr = [
+          place.street,
+          place.subLocality,
+          place.locality,
+          place.postalCode,
+          place.country
+        ].where((part) => part != null && part.isNotEmpty).join(', ');
+
         setState(() {
           _selectedAddress = addr;
           _searchController.text = addr;
@@ -74,6 +117,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
       }
     } catch (e) {
       print('Error getting address: $e');
+      Get.snackbar('Error', 'Could not fetch address details');
     }
   }
 
@@ -81,51 +125,55 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.whiteTheme,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              Text(
+              const Text(
                 "Select Address",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              Spacer(),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _manualMode = !_manualMode;
-                  });
-                },
-                child: Text(_manualMode ? "Use Map" : "Enter Manually"),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.my_location),
+                onPressed: _fetchCurrentLocation,
+                tooltip: 'Current Location',
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
+          // Search Field
           GooglePlaceAutoCompleteTextField(
             textEditingController: _searchController,
             googleAPIKey: googleApiKey,
             inputDecoration: InputDecoration(
-              hintText: _manualMode ? 'Enter address manually' : 'Search location...',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.search),
+              hintText: 'Search location...',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() => _selectedAddress = null);
+                },
+              )
+                  : null,
             ),
-            debounceTime: 600,
-            countries: ["pk"],
+            debounceTime: 800,
+            countries: const ["pk"],
             isLatLngRequired: true,
-            // getPlaceDetailWithLatLng: true,
             itemClick: (prediction) async {
               _searchController.text = prediction.description ?? "";
-              setState(() {
-                _selectedAddress = prediction.description;
-              });
+              setState(() => _selectedAddress = prediction.description);
 
-              if (prediction.lat != null && prediction.lng != null && !_manualMode) {
+              if (prediction.lat != null && prediction.lng != null) {
                 await _updateLocation(
                   LatLng(
                     double.parse(prediction.lat!),
@@ -136,47 +184,100 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
             },
           ),
 
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-          if (!_manualMode)
-            Expanded(
-              child: GoogleMap(
-                onMapCreated: (controller) => _mapController = controller,
+          // Map View
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : GoogleMap(
+                onMapCreated: (controller) {
+                  _mapController = controller;
+                  if (_selectedLocation != null) {
+                    controller.animateCamera(
+                      CameraUpdate.newLatLngZoom(_selectedLocation!, 16),
+                    );
+                  }
+                },
                 initialCameraPosition: CameraPosition(
-                  target: _selectedLocation ?? LatLng(31.5204, 74.3587),
+                  target: _selectedLocation ?? const LatLng(31.5204, 74.3587),
                   zoom: 15,
                 ),
                 markers: _selectedLocation != null
                     ? {
                   Marker(
-                    markerId: MarkerId('selected_location'),
+                    markerId: const MarkerId('selected_location'),
                     position: _selectedLocation!,
+                    infoWindow: InfoWindow(
+                      title: "Selected Location",
+                      snippet: _selectedAddress,
+                    ),
                   )
                 }
                     : {},
                 onTap: (latLng) async {
                   await _updateLocation(latLng);
                 },
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false, // We have our own button
+                mapToolbarEnabled: true,
+                zoomControlsEnabled: false,
+                buildingsEnabled: true,
+                rotateGesturesEnabled: true,
               ),
             ),
-          if (_manualMode) SizedBox(height: 250), // space placeholder
+          ),
 
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              final address = _searchController.text.trim();
-              if (address.isNotEmpty) {
-                widget.onSelectAddress(address);
-                Navigator.pop(context);
-              } else {
-                Get.snackbar('Error', 'Please enter or select an address');
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.darkBlueShade,
-              minimumSize: Size(double.infinity, 50),
+          // Selected Address Preview
+          if (_selectedAddress != null && _selectedAddress!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Selected Address:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _selectedAddress!,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            child: Text('Confirm Address', style: TextStyle(color: Colors.white)),
+
+          // Confirm Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _selectedAddress != null && _selectedAddress!.isNotEmpty
+                  ? () {
+                widget.onSelectAddress(_selectedAddress!);
+                Navigator.pop(context);
+              }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.darkBlueShade,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('Confirm Address',
+                  style: TextStyle(color: Colors.white)),
+            ),
           ),
         ],
       ),
@@ -185,6 +286,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
 
   @override
   void dispose() {
+    _mapController?.dispose();
     _searchController.dispose();
     super.dispose();
   }

@@ -104,93 +104,97 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            CustomText(
-              text: "OTP Verification",
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.appColor,
-            ),
-            const SizedBox(height: 10),
-            const CustomText(
-              text: "We've sent a 4-digit verification code to",
-              fontSize: 16,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 5),
-            CustomText(
-              text: _formatPhoneNumber(widget.phoneNumber),
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.appColor,
-            ),
-            const SizedBox(height: 40),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              CustomText(
+                text: "OTP Verification",
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.appColor,
+              ),
+              const SizedBox(height: 10),
+              const CustomText(
+                text: "We've sent a 4-digit verification code to",
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+              const SizedBox(height: 5),
+              CustomText(
+                text: _formatPhoneNumber(widget.phoneNumber),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.appColor,
+              ),
+              const SizedBox(height: 40),
 
-            // 4-digit OTP input
-            Center(
-              child: Pinput(
-                length: 4,
-                controller: _otpController,
-                defaultPinTheme: defaultPinTheme,
-                focusedPinTheme: defaultPinTheme.copyWith(
-                  decoration: defaultPinTheme.decoration!.copyWith(
-                    border: Border.all(color: AppColors.appColor),
+              // OTP Input
+              Center(
+                child: Pinput(
+                  length: 4,
+                  controller: _otpController,
+                  defaultPinTheme: defaultPinTheme,
+                  focusedPinTheme: defaultPinTheme.copyWith(
+                    decoration: defaultPinTheme.decoration!.copyWith(
+                      border: Border.all(color: AppColors.appColor),
+                    ),
+                  ),
+                  showCursor: true,
+                  onCompleted: (pin) => _verifyOtp(),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Resend OTP
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: _isResendEnabled ? _resendOtp : null,
+                  child: Text(
+                    _isResendEnabled ? "Resend OTP" : "Resend in $_secondsRemaining s",
+                    style: TextStyle(
+                      color: _isResendEnabled ? AppColors.appColor : Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                showCursor: true,
-                onCompleted: (pin) => _verifyOtp(),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
-            // Resend OTP
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: _isResendEnabled ? _resendOtp : null,
-                child: Text(
-                  _isResendEnabled ? "Resend OTP" : "Resend in $_secondsRemaining s",
-                  style: TextStyle(
-                    color: _isResendEnabled ? AppColors.appColor : Colors.grey,
+              // Verify Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.buttonColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: _verifyOtp,
+                  child: const CustomText(
+                    text: "Verify",
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-            // Verify Button
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.buttonColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: _verifyOtp,
-                child: const CustomText(
-                  text: "Verify",
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              // Additional message
+              const Center(
+                child: Text(
+                  "Didn't receive code? Check your spam folder",
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
                 ),
               ),
-            ),
-            const Spacer(),
-
-            const Center(
-              child: Text(
-                "Didn't receive code? Check your spam folder",
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ),
-          ],
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

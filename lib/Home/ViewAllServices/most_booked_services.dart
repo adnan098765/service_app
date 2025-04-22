@@ -47,7 +47,7 @@ class ServiceList extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           ServiceCard(
-            title: 'Muslim shower replacement',
+            title: ' shower replacement',
             description: 'per muslim shower',
             originalPrice: '',
             discountedPrice: 'Rs. 800',
@@ -78,8 +78,8 @@ class ServiceCard extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Container(
-      height: height * 0.150,
-      width: width * 0.800,
+      height: height * 0.140,
+      width: width*0.85,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.appColor,
@@ -114,7 +114,7 @@ class ServiceCard extends StatelessWidget {
                 ),
                 Text(
                   description,
-                  style: const TextStyle(color: Colors.white70),
+                  style: const TextStyle(color: Colors.white70,overflow: TextOverflow.ellipsis),
                 ),
                 Row(
                   children: [

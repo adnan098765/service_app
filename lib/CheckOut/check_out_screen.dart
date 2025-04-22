@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/CheckOut/service_card.dart';
 import 'package:untitled2/CheckOut/total_price.dart';
 import 'package:untitled2/CheckOut/schedule_section.dart';
+import 'package:untitled2/Home/home_screen.dart';
 import 'package:untitled2/widgets/custom_container.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 import 'address_selection.dart';
@@ -87,7 +90,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             SizedBox(height: 24),
             GestureDetector(
               onTap: () {
+                // Validate all required fields are filled
+                if (_selectedDate == null || _selectedTime == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please select date and time for service')),
+                  );
+                  return;
+                }
+
+                if (_address.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please provide a delivery address')),
+                  );
+                  return;
+                }
+
                 // You can add the order placement logic here
+                print("Placing order for services: ${widget.selectedServices}");
+                print("Delivery address: $_address");
+                print("Service date: $_selectedDate, time: $_selectedTime");
+
+                // Show confirmation
+               Get.snackbar("Gee Hazir Janab", "Your order placed successfully",backgroundColor: AppColors.appColor,colorText: AppColors.whiteTheme);
               },
               child: CustomContainer(
                 height: 60,
@@ -153,16 +177,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _editAddress() {
+    print("Edit address button tapped");
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => AddressSelectionSheet(
         currentAddress: _address,
-        onSelectAddress: (address) {
+        onSelectAddress: (String newAddress) {
+          print("New address selected: $newAddress");
+          // Make sure to update the UI with setState
           setState(() {
-            _address = address;
+            _address = newAddress;
           });
-        }, savedAddresses: [], onAddNewAddress: () {  },
+          print("Address updated to: $_address");
+        },
+        savedAddresses: [],
+        onAddNewAddress: () {
+          // This could be implemented later to save addresses
+          print("Add new address requested");
+        },
       ),
     );
   }

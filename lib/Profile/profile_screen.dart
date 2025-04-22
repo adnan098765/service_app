@@ -7,7 +7,6 @@ import 'package:untitled2/WebPages/privacy_policy.dart';
 import 'package:untitled2/WebPages/terms_and_conditions.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 import 'dart:io';
-
 import 'Account/account_screen.dart';
 import 'OrderPage/order_screen.dart';
 import 'Wallet/wallet_screen.dart';

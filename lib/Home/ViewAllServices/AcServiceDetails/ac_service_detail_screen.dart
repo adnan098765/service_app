@@ -263,8 +263,8 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
                     ],
                   ),
                   Container(
-                    height: 20,
-                    width: 36,
+                    height: height*0.028,
+                    width: width*0.12,
                     decoration: BoxDecoration(
                       color: AppColors.lightGrey,
                       borderRadius: BorderRadius.circular(5),
@@ -297,8 +297,8 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                    horizontal: 2,
+                    vertical: 1,
                   ),
                 ),
                 child: Row(

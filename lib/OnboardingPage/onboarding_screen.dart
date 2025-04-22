@@ -68,8 +68,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final color = Color(int.parse(onboardingData[currentPage]["color"]!.substring(1, 7), radix: 16) + 0xFF000000);
-
+   double height = MediaQuery.of(context).size.height;
+   double width = MediaQuery.of(context).size.width;
     return Scaffold(
+
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -125,7 +127,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             right: 0,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 500),
-              height: 220,
+              height: height*0.3,
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -143,18 +145,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   // Animated Text
                   AnimatedSwitcher(
+
                     duration: const Duration(milliseconds: 500),
                     child: Text(
                       onboardingData[currentPage]["heading"]!,
                       key: ValueKey<String>(onboardingData[currentPage]["heading"]!),
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: color,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                   SizedBox(height: height*0.0050),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
                     child: Text(
@@ -167,7 +170,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  // const SizedBox(height: 10),
                   Row(
                     children: [
                       // Page Indicators
@@ -175,6 +178,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         children: List.generate(
                           onboardingData.length,
                               (index) => AnimatedContainer(
+                                // height:height*0.3,
                             duration: const Duration(milliseconds: 300),
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             width: currentPage == index ? 24 : 8,
@@ -183,6 +187,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               color: currentPage == index ? color : Colors.grey[300],
                               borderRadius: BorderRadius.circular(4),
                             ),
+
                           ),
                         ),
                       ),
