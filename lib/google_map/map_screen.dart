@@ -268,12 +268,13 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
           ),
           Expanded(
             child: GoogleMap(
+              mapType: MapType.hybrid,
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
               },
               initialCameraPosition: CameraPosition(
                 target: selectedLocation ?? initialPosition,
-                zoom: 15,
+                zoom: 20,
               ),
               markers: {
                 Marker(

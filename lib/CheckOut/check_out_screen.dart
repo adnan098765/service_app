@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/CheckOut/service_card.dart';
 import 'package:untitled2/CheckOut/total_price.dart';
 import 'package:untitled2/CheckOut/schedule_section.dart';
-import 'package:untitled2/Home/home_screen.dart';
 import 'package:untitled2/widgets/custom_container.dart';
 import 'package:untitled2/widgets/custom_text.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'address_selection.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -22,7 +23,9 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   DateTime? _selectedDate;
   String? _selectedTime;
-  String _address = "Azeem Boys Hostel Johar View Lahore Punjab";
+  String _address = "Fetching current location";
+  bool _isLoadingLocation = true;
+  final String _googleMapsApiKey = "AIzaSyClwNhuYxVRorDGtuXSgH8bU7AaTDeJzH0";
 
   final Map<String, int> servicePrices = {
     "AC Dismounting": 1000,
@@ -30,6 +33,89 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     "AC repairing": 1850,
     "Floor standing cabinet Ac general service": 1850,
   };
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch location as soon as the screen loads
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    setState(() {
+      _isLoadingLocation = true;
+      _address = "Fetching current location...";
+    });
+
+    try {
+      // Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        setState(() {
+          _address = "Location services are disabled";
+          _isLoadingLocation = false;
+        });
+        return;
+      }
+
+      // Check for location permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          setState(() {
+            _address = "Location permissions are denied";
+            _isLoadingLocation = false;
+          });
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        setState(() {
+          _address = "Location permissions are permanently denied";
+          _isLoadingLocation = false;
+        });
+        return;
+      }
+
+      // Get current position with high accuracy
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high
+      );
+
+      // Use Google Maps Geocoding API directly with HTTP request
+      String url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$_googleMapsApiKey';
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'OK' && data['results'].isNotEmpty) {
+          setState(() {
+            _address = data['results'][0]['formatted_address'];
+            _isLoadingLocation = false;
+          });
+        } else {
+          setState(() {
+            _address = "Unable to fetch detailed address";
+            _isLoadingLocation = false;
+          });
+        }
+      } else {
+        setState(() {
+          _address = "Error connecting to location service";
+          _isLoadingLocation = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _address = "Error fetching location. Please try again.";
+        _isLoadingLocation = false;
+      });
+      print("Location error: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,16 +178,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               onTap: () {
                 // Validate all required fields are filled
                 if (_selectedDate == null || _selectedTime == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please select date and time for service')),
-                  );
+                  Get.snackbar("Gee Hazir Janab", "Please select time and date for the service",
+                      backgroundColor: AppColors.appColor, colorText: AppColors.whiteTheme);
                   return;
                 }
 
-                if (_address.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please provide a delivery address')),
-                  );
+                if (_address.isEmpty || _isLoadingLocation) {
+                  Get.snackbar("Gee Hazir Janab", "Please wait for location to be fetched or provide an address",
+                      backgroundColor: AppColors.appColor, colorText: AppColors.whiteTheme);
                   return;
                 }
 
@@ -111,7 +195,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 print("Service date: $_selectedDate, time: $_selectedTime");
 
                 // Show confirmation
-               Get.snackbar("Gee Hazir Janab", "Your order placed successfully",backgroundColor: AppColors.appColor,colorText: AppColors.whiteTheme);
+                Get.snackbar("Gee Hazir Janab", "Your order placed successfully",
+                    backgroundColor: AppColors.appColor, colorText: AppColors.whiteTheme);
               },
               child: CustomContainer(
                 height: 60,
@@ -156,7 +241,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(_address, style: TextStyle(fontSize: 16)),
+                    _isLoadingLocation
+                        ? Row(
+                      children: [
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.darkBlueShade),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Text("Fetching your location", style: TextStyle(fontSize: 16)),
+                      ],
+                    )
+                        : Text(_address, style: TextStyle(fontSize: 16)),
                     SizedBox(height: 5),
                     Text(
                       "Tap edit to change address",
@@ -168,6 +268,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               IconButton(
                 icon: Icon(Icons.edit, color: AppColors.darkBlueShade),
                 onPressed: _editAddress,
+              ),
+              IconButton(
+                icon: Icon(Icons.my_location, color: AppColors.darkBlueShade),
+                onPressed: _getCurrentLocation,
               ),
             ],
           ),
@@ -189,6 +293,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           // Make sure to update the UI with setState
           setState(() {
             _address = newAddress;
+            _isLoadingLocation = false;
           });
           print("Address updated to: $_address");
         },
