@@ -95,7 +95,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
   }
 
   void _setDefaultLocation() {
-    _updateLocation(LatLng(31.5204, 74.3587)); // Default to Lahore
+    _updateLocation(LatLng(31.5204, 74.3587));
   }
 
   Future<void> _updateLocation(LatLng location) async {
@@ -104,8 +104,6 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
     setState(() {
       _selectedLocation = location;
     });
-
-    // This ensures the map moves to the new location
     if (_mapController != null) {
       await _mapController!.animateCamera(
         CameraUpdate.newLatLngZoom(location, 16),
@@ -223,8 +221,6 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
               ],
             ),
           ),
-
-          // Search Field
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: GooglePlaceAutoCompleteTextField(
