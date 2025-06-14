@@ -6,7 +6,6 @@ import 'categories_page.dart';
 import 'maintenance_page.dart';
 import 'offer_page.dart';
 import 'ViewAllServices/home_services_screen.dart';
-
 class HomeScreen extends StatefulWidget {
   final double latitude;
   final double longitude;

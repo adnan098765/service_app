@@ -10,6 +10,93 @@ import 'package:untitled2/widgets/custom_text.dart';
 import '../AppColors/app_colors.dart';
 import '../BottomNavBar/bottom_nav_screen.dart';
 
+// New Confirmation Screen
+class LocationConfirmationScreen extends StatelessWidget {
+  final LatLng selectedLocation;
+  final String? address;
+  final String? city;
+  final bool isManualLocation;
+
+  const LocationConfirmationScreen({
+    super.key,
+    required this.selectedLocation,
+    this.address,
+    this.city,
+    required this.isManualLocation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.whiteTheme,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomText(
+              text: 'Delivering service at:',
+              fontSize: 20.px,
+              fontWeight: FontWeight.bold,
+              color: AppColors.darkBlueShade,
+            ),
+            SizedBox(height: 20.px),
+            // Wrap CustomText in a Container to handle text alignment
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.px),
+              width: double.infinity,
+              child: Center(
+                child: CustomText(
+                  text: address ?? 'Selected Location',
+                  fontSize: 18.px,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            if (city != null) ...[
+              SizedBox(height: 10.px),
+              CustomText(
+                text: city!,
+                fontSize: 16.px,
+                color: Colors.grey.shade600,
+              ),
+            ],
+            SizedBox(height: 30.px),
+            InkWell(
+              onTap: () {
+                Get.offAll(BottomNavScreen(
+                  latitude: selectedLocation.latitude,
+                  longitude: selectedLocation.longitude,
+                  address: address,
+                  city: city,
+                  isManualLocation: isManualLocation,
+                ));
+              },
+              borderRadius: BorderRadius.circular(30),
+              child: Container(
+                width: 200.px,
+                padding: EdgeInsets.symmetric(vertical: 16.px),
+                decoration: BoxDecoration(
+                  color: AppColors.darkBlueShade,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Center(
+                  child: Text(
+                    'Continue',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.px,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 class CombinedLocationScreen extends StatefulWidget {
   const CombinedLocationScreen({super.key, required Null Function(dynamic location, dynamic address) onSelect});
 
@@ -107,9 +194,8 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
 
   void _navigateToBottomNavScreen() {
     if (selectedLocation != null) {
-      Get.offAll(BottomNavScreen(
-        latitude: selectedLocation!.latitude,
-        longitude: selectedLocation!.longitude,
+      Get.to(() => LocationConfirmationScreen(
+        selectedLocation: selectedLocation!,
         address: address,
         city: city,
         isManualLocation: isManualSelection,
@@ -168,7 +254,7 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
         : const LatLng(0, 0);
 
     return Scaffold(
-      appBar:AppBar(
+      appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: AppColors.darkBlueShade,
         bottom: PreferredSize(
@@ -177,10 +263,6 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
             child: Row(
               children: [
-                // IconButton(
-                //   icon: Icon(Icons.arrow_back, color: AppColors.whiteTheme),
-                //   onPressed: () => Get.back(),
-                // ),
                 SizedBox(width: 10),
                 Expanded(
                   child: Container(
@@ -196,8 +278,8 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
                         hintText: 'Search for a location...',
                         hintStyle: TextStyle(color: Colors.grey.shade500),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10,horizontal: 20), // This centers vertically
-                        isDense: true, // Reduces extra padding
+                        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        isDense: true,
                         prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
                         suffixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
                         suffixIcon: Padding(
@@ -268,7 +350,7 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
           ),
           Expanded(
             child: GoogleMap(
-              mapType: MapType.hybrid,
+              mapType: MapType.normal,
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
               },
