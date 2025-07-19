@@ -8,7 +8,7 @@
 PRODUCT_NAME = untitled2
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.untitled2
+PRODUCT_BUNDLE_IDENTIFIER = com.techbees.geehazirjanab
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.
