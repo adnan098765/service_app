@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Auth/authentication_screen.dart';
 import '../Auth/enter_phone_number.dart';
 
@@ -32,11 +33,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
+    _checkOnboardingStatus();
     _pageController.addListener(() {
       setState(() {
         _currentPosition = _pageController.page!;
       });
     });
+  }
+
+  Future<void> _checkOnboardingStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    if (hasSeenOnboarding) {
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => EnterPhoneNumber(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 800),
+        ),
+      );
+    }
   }
 
   void nextPage() {
@@ -49,15 +68,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         currentPage++;
       });
     } else {
+      _markOnboardingAsSeen();
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>  EnterPhoneNumber(),
+          pageBuilder: (context, animation, secondaryAnimation) => EnterPhoneNumber(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
+            return FadeTransition(opacity: animation, child: child);
           },
           transitionDuration: const Duration(milliseconds: 800),
         ),
@@ -65,17 +82,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
+  Future<void> _markOnboardingAsSeen() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasSeenOnboarding', true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = Color(int.parse(onboardingData[currentPage]["color"]!.substring(1, 7), radix: 16) + 0xFF000000);
-   double height = MediaQuery.of(context).size.height;
-   double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
-
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Animated Gradient Background
           AnimatedContainer(
             duration: const Duration(milliseconds: 500),
             decoration: BoxDecoration(
@@ -86,8 +106,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-
-          // PageView for onboarding screens
           PageView.builder(
             controller: _pageController,
             itemCount: onboardingData.length,
@@ -103,7 +121,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Full-Screen Image
                     Expanded(
                       child: Hero(
                         tag: 'onboarding-image-$index',
@@ -119,15 +136,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               );
             },
           ),
-
-          // Bottom Content Sheet
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 500),
-              height: height*0.3,
+              height: height * 0.3,
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -143,9 +158,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Animated Text
                   AnimatedSwitcher(
-
                     duration: const Duration(milliseconds: 500),
                     child: Text(
                       onboardingData[currentPage]["heading"]!,
@@ -157,7 +170,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                   ),
-                   SizedBox(height: height*0.0050),
+                  SizedBox(height: height * 0.0050),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
                     child: Text(
@@ -170,15 +183,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                   ),
-                  // const SizedBox(height: 10),
                   Row(
                     children: [
-                      // Page Indicators
                       Row(
                         children: List.generate(
                           onboardingData.length,
                               (index) => AnimatedContainer(
-                                // height:height*0.3,
                             duration: const Duration(milliseconds: 300),
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             width: currentPage == index ? 24 : 8,
@@ -187,12 +197,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               color: currentPage == index ? color : Colors.grey[300],
                               borderRadius: BorderRadius.circular(4),
                             ),
-
                           ),
                         ),
                       ),
                       const Spacer(),
-                      // Next Button
                       FloatingActionButton(
                         onPressed: nextPage,
                         backgroundColor: color,

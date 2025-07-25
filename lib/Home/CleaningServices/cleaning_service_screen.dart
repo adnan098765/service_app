@@ -1,7 +1,7 @@
 // import 'package:flutter/material.dart';
 // import 'package:untitled2/AppColors/app_colors.dart';
 // import 'package:untitled2/BottomNavigation/Home/CleaningServices/trending_service_screen.dart';
-// import 'package:untitled2/BottomNavigation/Home/ViewAllServices/AcServiceDetails/ac_service_detail_screen.dart';
+// import 'package:untitled2/BottomNavigation/Home/ViewAllServices/AcServiceDetails/category_detail_screen.dart';
 // import 'package:untitled2/BottomNavigation/Home/ViewAllServices/service_icon.dart';
 // import 'package:untitled2/widgets/custom_container.dart';
 // import 'package:untitled2/widgets/custom_text.dart';

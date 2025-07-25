@@ -9,6 +9,7 @@ import 'package:untitled2/widgets/custom_text.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../Controlller/add_address_controller.dart';
 import 'address_selection.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -23,9 +24,8 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   DateTime? _selectedDate;
   String? _selectedTime;
-  String _address = "Fetching current location";
-  bool _isLoadingLocation = true;
-  final String _googleMapsApiKey = "AIzaSyClwNhuYxVRorDGtuXSgH8bU7AaTDeJzH0";
+  final String _googleMapsApiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with dotenv.env['GOOGLE_MAPS_API_KEY']!
+  late final AddAddressController _addressController;
 
   final Map<String, int> servicePrices = {
     "AC Dismounting": 1000,
@@ -37,54 +37,36 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch location as soon as the screen loads
+    _addressController = Get.put(AddAddressController());
     _getCurrentLocation();
   }
 
   Future<void> _getCurrentLocation() async {
-    setState(() {
-      _isLoadingLocation = true;
-      _address = "Fetching current location...";
-    });
+    _addressController.currentAddress.value = "Fetching current location...";
 
     try {
-      // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        setState(() {
-          _address = "Location services are disabled";
-          _isLoadingLocation = false;
-        });
+        _addressController.currentAddress.value = "Location services are disabled";
         return;
       }
 
-      // Check for location permission
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          setState(() {
-            _address = "Location permissions are denied";
-            _isLoadingLocation = false;
-          });
+          _addressController.currentAddress.value = "Location permissions are denied";
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        setState(() {
-          _address = "Location permissions are permanently denied";
-          _isLoadingLocation = false;
-        });
+        _addressController.currentAddress.value = "Location permissions are permanently denied";
         return;
       }
 
-      // Get current position with high accuracy
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high
-      );
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-      // Use Google Maps Geocoding API directly with HTTP request
       String url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$_googleMapsApiKey';
 
       final response = await http.get(Uri.parse(url));
@@ -92,27 +74,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['status'] == 'OK' && data['results'].isNotEmpty) {
-          setState(() {
-            _address = data['results'][0]['formatted_address'];
-            _isLoadingLocation = false;
-          });
+          String fetchedAddress = data['results'][0]['formatted_address'];
+          _addressController.updateCurrentAddress(fetchedAddress);
+          await _addressController.addAddress(
+            addressType: 'current',
+            address: fetchedAddress,
+            latitude: position.latitude,
+            longitude: position.longitude,
+            isDefault: _addressController.savedAddresses.isEmpty,
+          );
         } else {
-          setState(() {
-            _address = "Unable to fetch detailed address";
-            _isLoadingLocation = false;
-          });
+          _addressController.currentAddress.value = "Unable to fetch detailed address";
         }
       } else {
-        setState(() {
-          _address = "Error connecting to location service";
-          _isLoadingLocation = false;
-        });
+        _addressController.currentAddress.value = "Error connecting to location service";
       }
     } catch (e) {
-      setState(() {
-        _address = "Error fetching location. Please try again.";
-        _isLoadingLocation = false;
-      });
+      _addressController.currentAddress.value = "Error fetching location. Please try again.";
       print("Location error: $e");
     }
   }
@@ -127,7 +105,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         iconTheme: IconThemeData(color: AppColors.whiteTheme),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -144,67 +122,89 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 setState(() => _selectedTime = time);
               },
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             _buildAddressSection(),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Text(
               "Services list",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ...widget.selectedServices.entries.map((entry) => ServiceCard(
               title: entry.key,
               description: "Per AC (1 to 2.5 tons)",
               originalPrice: "Rs. 1200",
-              discountedPrice: "Rs. 1000",
+              discountedPrice: "Rs. ${servicePrices[entry.key]!.toString()}",
               rating: 4.8,
               count: entry.value,
               onQuantityChanged: (newCount) {
                 setState(() {
-                  widget.selectedServices[entry.key] = newCount;
                   if (newCount == 0) {
                     widget.selectedServices.remove(entry.key);
+                  } else {
+                    widget.selectedServices[entry.key] = newCount;
                   }
                 });
               },
             )),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             TotalPriceCard(
               selectedServices: widget.selectedServices,
               servicePrices: servicePrices,
             ),
-            SizedBox(height: 24),
-            GestureDetector(
-              onTap: () {
-                // Validate all required fields are filled
+            const SizedBox(height: 24),
+            Obx(() => GestureDetector(
+              onTap: _addressController.isLoading.value
+                  ? null
+                  : () {
                 if (_selectedDate == null || _selectedTime == null) {
-                  Get.snackbar("Gee Hazir Janab", "Please select time and date for the service",
-                      backgroundColor: AppColors.appColor, colorText: AppColors.whiteTheme);
+                  Get.snackbar(
+                    "Gee Hazir Janab",
+                    "Please select time and date for the service",
+                    backgroundColor: AppColors.appColor,
+                    colorText: AppColors.whiteTheme,
+                  );
                   return;
                 }
 
-                if (_address.isEmpty || _isLoadingLocation) {
-                  Get.snackbar("Gee Hazir Janab", "Please wait for location to be fetched or provide an address",
-                      backgroundColor: AppColors.appColor, colorText: AppColors.whiteTheme);
+                if (_addressController.currentAddress.value.isEmpty ||
+                    _addressController.currentAddress.value.contains("Fetching") ||
+                    _addressController.currentAddress.value.contains("Error")) {
+                  Get.snackbar(
+                    "Gee Hazir Janab",
+                    "Please wait for location to be fetched or provide an address",
+                    backgroundColor: AppColors.appColor,
+                    colorText: AppColors.whiteTheme,
+                  );
                   return;
                 }
 
-                // You can add the order placement logic here
-                print("Placing order for services: ${widget.selectedServices}");
-                print("Delivery address: $_address");
-                print("Service date: $_selectedDate, time: $_selectedTime");
+                // Simulate order placement (replace with actual API call)
+                print("Order Details:");
+                print("Services: ${widget.selectedServices}");
+                print("Address: ${_addressController.currentAddress.value}");
+                print("Date: $_selectedDate, Time: $_selectedTime");
 
-                // Show confirmation
-                Get.snackbar("Gee Hazir Janab", "Your order placed successfully",
-                    backgroundColor: AppColors.appColor, colorText: AppColors.whiteTheme);
+                Get.snackbar(
+                  "Gee Hazir Janab",
+                  "Your order placed successfully",
+                  backgroundColor: AppColors.appColor,
+                  colorText: AppColors.whiteTheme,
+                );
               },
               child: CustomContainer(
                 height: 60,
                 width: double.infinity,
-                color: AppColors.darkBlueShade,
+                color: _addressController.isLoading.value
+                    ? AppColors.darkBlueShade.withOpacity(0.6)
+                    : AppColors.darkBlueShade,
                 borderRadius: 15,
                 child: Center(
-                  child: CustomText(
+                  child: _addressController.isLoading.value
+                      ? CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.whiteTheme),
+                  )
+                      : CustomText(
                     text: "Place Order",
                     color: AppColors.whiteTheme,
                     fontSize: 22,
@@ -212,7 +212,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                 ),
               ),
-            ),
+            )),
           ],
         ),
       ),
@@ -227,9 +227,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           "Address",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 10),
-        Container(
-          padding: EdgeInsets.all(12),
+        const SizedBox(height: 10),
+        Obx(() => Container(
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey.shade300),
@@ -241,7 +241,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _isLoadingLocation
+                    _addressController.currentAddress.value.contains("Fetching")
                         ? Row(
                       children: [
                         SizedBox(
@@ -252,12 +252,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             valueColor: AlwaysStoppedAnimation<Color>(AppColors.darkBlueShade),
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text("Fetching your location", style: TextStyle(fontSize: 16)),
                       ],
                     )
-                        : Text(_address, style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 5),
+                        : Text(
+                      _addressController.currentAddress.value.isEmpty
+                          ? "No address selected"
+                          : _addressController.currentAddress.value,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 5),
                     Text(
                       "Tap edit to change address",
                       style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -275,34 +280,47 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             ],
           ),
-        ),
+        )),
       ],
     );
   }
 
   void _editAddress() {
-    print("Edit address button tapped");
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => AddressSelectionSheet(
-        currentAddress: _address,
-        onSelectAddress: (String newAddress) {
-          print("New address selected: $newAddress");
-          // Make sure to update the UI with setState
-          setState(() {
-            _address = newAddress;
-            _isLoadingLocation = false;
-          });
-          print("Address updated to: $_address");
+        currentAddress: _addressController.currentAddress.value,
+        onSelectAddress: (String newAddress, double latitude, double longitude) {
+          _addressController.updateCurrentAddress(newAddress);
+          _saveSelectedAddress(newAddress, latitude, longitude);
         },
-        savedAddresses: [],
+        savedAddresses: _addressController.getAddressesForUI(),
         onAddNewAddress: () {
-          // This could be implemented later to save addresses
           print("Add new address requested");
         },
       ),
     );
+  }
+
+  Future<void> _saveSelectedAddress(String address, double latitude, double longitude) async {
+    try {
+      await _addressController.addAddress(
+        addressType: 'selected',
+        address: address,
+        latitude: latitude,
+        longitude: longitude,
+        isDefault: _addressController.savedAddresses.isEmpty,
+      );
+    } catch (e) {
+      print("Error saving selected address: $e");
+      Get.snackbar('Error', 'Failed to save address');
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

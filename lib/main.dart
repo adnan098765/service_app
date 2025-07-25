@@ -3,16 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 // import 'dart:html' as html;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:untitled2/Home/ViewAllServices/home_services_screen.dart';
+import 'Home/home_screen.dart';
 import 'Splash/splash_screen.dart';
 import 'google_map/map_screen.dart';
 
 void main() async {
-
-  // Ensure Flutter bindings are initialized
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Firebase
-  await Firebase.initializeApp();
+  //
+  // // Ensure Flutter bindings are initialized
+  // WidgetsFlutterBinding.ensureInitialized();
+  //
+  // // Initialize Firebase
+  // await Firebase.initializeApp();
 
   // Register a custom view for the map
   // ui.platformViewRegistry.registerViewFactory(
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
+      // home: const HomeScreen(),
       home: const SplashScreen(),
     );
   }

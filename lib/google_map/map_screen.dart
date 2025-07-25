@@ -6,9 +6,11 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/widgets/custom_text.dart';
-import '../AppColors/app_colors.dart';
+import '../Controlller/add_address_controller.dart';
 import '../BottomNavBar/bottom_nav_screen.dart';
+import '../SharedPreference/shared_preference.dart';
 
 // New Confirmation Screen
 class LocationConfirmationScreen extends StatelessWidget {
@@ -16,6 +18,8 @@ class LocationConfirmationScreen extends StatelessWidget {
   final String? address;
   final String? city;
   final bool isManualLocation;
+  final int customerId;
+  final String? token;
 
   const LocationConfirmationScreen({
     super.key,
@@ -23,10 +27,14 @@ class LocationConfirmationScreen extends StatelessWidget {
     this.address,
     this.city,
     required this.isManualLocation,
+    required this.customerId,
+    this.token,
   });
 
   @override
   Widget build(BuildContext context) {
+    final AddAddressController addAddressController = Get.find<AddAddressController>();
+
     return Scaffold(
       backgroundColor: AppColors.whiteTheme,
       body: Center(
@@ -40,7 +48,6 @@ class LocationConfirmationScreen extends StatelessWidget {
               color: AppColors.darkBlueShade,
             ),
             SizedBox(height: 20.px),
-            // Wrap CustomText in a Container to handle text alignment
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16.px),
               width: double.infinity,
@@ -61,15 +68,33 @@ class LocationConfirmationScreen extends StatelessWidget {
               ),
             ],
             SizedBox(height: 30.px),
-            InkWell(
-              onTap: () {
-                Get.offAll(BottomNavScreen(
+            Obx(() => addAddressController.isLoading.value
+                ? CircularProgressIndicator(color: AppColors.darkBlueShade)
+                : InkWell(
+              onTap: () async {
+                if (token == null) {
+                  Get.snackbar('Error', 'Authentication token missing');
+                  print('[LOG] LocationConfirmationScreen: token is null');
+                  return;
+                }
+                print('[LOG] Calling addAddress with customerId=$customerId, token=$token');
+                bool success = await addAddressController.addAddress(
+                  addressType: 'home',
+                  address: address ?? 'Unknown Address',
                   latitude: selectedLocation.latitude,
                   longitude: selectedLocation.longitude,
-                  address: address,
-                  city: city,
-                  isManualLocation: isManualLocation,
-                ));
+                  isDefault: true,
+                  customerId: customerId,
+                );
+                if (success) {
+                  Get.offAll(BottomNavScreen(
+                    latitude: selectedLocation.latitude,
+                    longitude: selectedLocation.longitude,
+                    address: address,
+                    city: city,
+                    isManualLocation: isManualLocation,
+                  ));
+                }
               },
               borderRadius: BorderRadius.circular(30),
               child: Container(
@@ -81,7 +106,7 @@ class LocationConfirmationScreen extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'Continue',
+                    'Confirm Address',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16.px,
@@ -90,7 +115,7 @@ class LocationConfirmationScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
+            )),
           ],
         ),
       ),
@@ -98,7 +123,9 @@ class LocationConfirmationScreen extends StatelessWidget {
   }
 }
 class CombinedLocationScreen extends StatefulWidget {
-  const CombinedLocationScreen({super.key, required Null Function(dynamic location, dynamic address) onSelect});
+  final Function(LatLng, String)? onSelect;
+
+  const CombinedLocationScreen({super.key, this.onSelect});
 
   @override
   State<CombinedLocationScreen> createState() => _CombinedLocationScreenState();
@@ -108,16 +135,24 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
   final searchController = TextEditingController();
   GoogleMapController? mapController;
   LatLng? selectedLocation;
-  final String googleApiKey = "AIzaSyClwNhuYxVRorDGtuXSgH8bU7AaTDeJzH0";
+  final String googleApiKey = "AIzaSyBYJbjMnqYFSQ1lssqHH4A52HWD1H13FtI";
   bool isLoading = true;
   String? address;
   String? city;
   Position? currentPosition;
   bool isManualSelection = false;
-
+  int? customerId;
+  String? token;
   @override
   void initState() {
     super.initState();
+    Get.put(AddAddressController());
+    final args = Get.arguments;
+    print('[LOG] CombinedLocationScreen arguments: $args');
+    if (args != null) {
+      customerId = args['customerId'] as int?;
+      token = args['token'] as String?;
+    }
     _fetchCurrentLocation();
   }
 
@@ -192,30 +227,32 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
     _getAddressFromLatLng(newLocation.latitude, newLocation.longitude);
   }
 
-  void _navigateToBottomNavScreen() {
-    if (selectedLocation != null) {
-      Get.to(() => LocationConfirmationScreen(
-        selectedLocation: selectedLocation!,
-        address: address,
-        city: city,
-        isManualLocation: isManualSelection,
-      ));
-    } else {
+  void _navigateToConfirmationScreen() {
+    if (selectedLocation == null) {
       Get.snackbar('Error', 'Please select a location first');
+      return;
     }
-  }
-
-  void _handleCurrentLocationTap() async {
+    if (customerId == null || token == null) {
+      Get.snackbar('Error', 'Authentication data missing. Please try again.');
+      print('[LOG] Navigation failed: customerId=$customerId, token=$token');
+      return;
+    }
+    Get.to(() => LocationConfirmationScreen(
+      selectedLocation: selectedLocation!,
+      address: address,
+      city: city,
+      isManualLocation: isManualSelection,
+      customerId: customerId!,
+      token: token!,
+    ));
+  }  void _handleCurrentLocationTap() async {
     if (currentPosition != null) {
       _setSelectedLocation(
         LatLng(currentPosition!.latitude, currentPosition!.longitude),
         isManual: false,
       );
-      await _getAddressFromLatLng(
-          currentPosition!.latitude,
-          currentPosition!.longitude
-      );
-      _navigateToBottomNavScreen();
+      await _getAddressFromLatLng(currentPosition!.latitude, currentPosition!.longitude);
+      _navigateToConfirmationScreen();
     } else {
       await _fetchCurrentLocation();
       if (currentPosition != null) {
@@ -239,9 +276,9 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
               CircularProgressIndicator(color: AppColors.darkBlueShade),
               SizedBox(height: 20),
               CustomText(
-                  text: 'Fetching your location...',
-                  fontSize: 16.px,
-                  fontWeight: FontWeight.bold
+                text: 'Fetching your location...',
+                fontSize: 16.px,
+                fontWeight: FontWeight.bold,
               ),
             ],
           ),
@@ -330,8 +367,8 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
               height: height * 0.050,
               width: width,
               decoration: BoxDecoration(
-                  border: Border.all(),
-                  color: AppColors.lightGrey
+                border: Border.all(),
+                color: AppColors.lightGrey,
               ),
               child: Row(
                 children: [
@@ -375,13 +412,13 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
             child: Column(
               children: [
                 CustomText(
-                    text: 'Where do you want service?',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18.px
+                  text: 'Where do you want service?',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.px,
                 ),
                 SizedBox(height: height * 0.020),
                 InkWell(
-                  onTap: _navigateToBottomNavScreen,
+                  onTap: _navigateToConfirmationScreen,
                   borderRadius: BorderRadius.circular(30),
                   child: Container(
                     width: double.infinity,
@@ -401,7 +438,7 @@ class _CombinedLocationScreenState extends State<CombinedLocationScreen> {
                       ),
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),

@@ -1,61 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
+import '../../Controlller/get_category_with_featured.dart';
 
 class ServiceList extends StatelessWidget {
   const ServiceList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          const SizedBox(width: 10),
-          ServiceCard(
-            title: 'AC Installation',
-            description: 'Installation with 10 Feet pipe (1 to 2.5 tons)',
-            originalPrice: 'Rs. 3250',
-            discountedPrice: 'Rs. 2500',
-          ),
-          const SizedBox(width: 10),
-          ServiceCard(
-            title: 'UPS installation',
-            description: 'vary after inspection',
-            originalPrice: '',
-            discountedPrice: 'Rs. 1300',
-          ),
-          const SizedBox(width: 10),
-          ServiceCard(
-            title: 'AC general service',
-            description: 'Wiring and circuit repairs',
-            originalPrice: 'Rs. 3500',
-            discountedPrice: 'Rs. 1850',
-          ),
-          const SizedBox(width: 10),
-          ServiceCard(
-            title: 'Electrical wiring',
-            description: 'Furniture assembly and repairs',
-            originalPrice: '',
-            discountedPrice: 'Rs. 500',
-          ),
-          const SizedBox(width: 10),
-          ServiceCard(
-            title: 'Cleaning Service',
-            description: 'Deep cleaning for homes and offices',
-            originalPrice: '',
-            discountedPrice: 'Rs. 800',
-          ),
-          const SizedBox(width: 10),
-          ServiceCard(
-            title: ' shower replacement',
-            description: 'per muslim shower',
-            originalPrice: '',
-            discountedPrice: 'Rs. 800',
-          ),
-          const SizedBox(width: 10),
-        ],
-      ),
-    );
+    final CategoriesWithFeaturedController controller =
+    Get.put(CategoriesWithFeaturedController());
+
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      final services = controller.model.value.data?.featuredServices ?? [];
+
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: services.map((service) {
+            return Row(
+              children: [
+                const SizedBox(width: 10),
+                ServiceCard(
+                  title: service.serviceName ?? '',
+                  description: service.description ?? '',
+                  originalPrice: service.salePrice != null
+                      ? 'Rs. ${service.regularPrice ?? ''}'
+                      : '',
+                  discountedPrice: 'Rs. ${service.regularPrice ?? ''}',
+                  imageUrl: service.image ?? '',
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      );
+    });
   }
 }
 
@@ -64,6 +48,7 @@ class ServiceCard extends StatelessWidget {
   final String description;
   final String originalPrice;
   final String discountedPrice;
+  final String imageUrl;
 
   const ServiceCard({
     super.key,
@@ -71,15 +56,17 @@ class ServiceCard extends StatelessWidget {
     required this.description,
     required this.originalPrice,
     required this.discountedPrice,
+    required this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+
     return Container(
       height: height * 0.140,
-      width: width*0.85,
+      width: width * 0.85,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.appColor,
@@ -93,12 +80,11 @@ class ServiceCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               image: DecorationImage(
-                image: AssetImage("assets/images/img.png"),
+                image: NetworkImage(imageUrl),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-
           SizedBox(width: width * 0.020),
           Expanded(
             child: Column(
@@ -114,17 +100,20 @@ class ServiceCard extends StatelessWidget {
                 ),
                 Text(
                   description,
-                  style: const TextStyle(color: Colors.white70,overflow: TextOverflow.ellipsis),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white70),
                 ),
                 Row(
                   children: [
-                    Text(
-                      originalPrice,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        decoration: TextDecoration.lineThrough,
+                    if (originalPrice.isNotEmpty)
+                      Text(
+                        originalPrice,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          decoration: TextDecoration.lineThrough,
+                        ),
                       ),
-                    ),
                     SizedBox(width: width * 0.015),
                     Text(
                       discountedPrice,

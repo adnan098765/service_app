@@ -3,13 +3,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
-import 'package:get/get.dart';
 import 'package:google_places_flutter/model/prediction.dart';
+import 'package:get/get.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
+import '../Controlller/add_address_controller.dart';
 
 class AddressSelectionSheet extends StatefulWidget {
   final String currentAddress;
-  final Function(String) onSelectAddress;
+  final Function(String, double, double) onSelectAddress;
   final List<Map<String, String>> savedAddresses;
   final Function() onAddNewAddress;
 
@@ -26,9 +27,10 @@ class AddressSelectionSheet extends StatefulWidget {
 }
 
 class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
-  final String googleApiKey = "AIzaSyClwNhuYxVRorDGtuXSgH8bU7AaTDeJzH0";
+  // Use environment variable for API key (assumes flutter_dotenv is set up)
+  final String googleApiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with dotenv.env['GOOGLE_MAPS_API_KEY']!
   final TextEditingController _searchController = TextEditingController();
-
+  late final AddAddressController _addressController;
   LatLng? _selectedLocation;
   String? _selectedAddress;
   GoogleMapController? _mapController;
@@ -37,6 +39,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
   @override
   void initState() {
     super.initState();
+    _addressController = Get.find<AddAddressController>();
     _searchController.text = widget.currentAddress;
     _selectedAddress = widget.currentAddress;
     _fetchCurrentLocation();
@@ -44,12 +47,9 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
 
   Future<void> _fetchCurrentLocation() async {
     try {
-      // Request location permissions
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        if (mounted) {
-          Get.snackbar('Location Disabled', 'Please enable location services');
-        }
+        Get.snackbar('Location Disabled', 'Please enable location services');
         _setDefaultLocation();
         return;
       }
@@ -58,24 +58,14 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          if (mounted) {
-            Get.snackbar(
-              'Permission Denied',
-              'Location permissions are denied',
-            );
-          }
+          Get.snackbar('Permission Denied', 'Location permissions are denied');
           _setDefaultLocation();
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        if (mounted) {
-          Get.snackbar(
-            'Permission Denied',
-            'Location permissions are permanently denied',
-          );
-        }
+        Get.snackbar('Permission Denied', 'Location permissions are permanently denied');
         _setDefaultLocation();
         return;
       }
@@ -95,7 +85,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
   }
 
   void _setDefaultLocation() {
-    _updateLocation(LatLng(31.5204, 74.3587));
+    _updateLocation(const LatLng(31.5204, 74.3587)); // Default: Lahore, Pakistan
   }
 
   Future<void> _updateLocation(LatLng location) async {
@@ -115,10 +105,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
 
   Future<void> _getAddressFromLatLng(double latitude, double longitude) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        latitude,
-        longitude,
-      );
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty && mounted) {
         Placemark place = placemarks[0];
         String addr = [
@@ -142,55 +129,35 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
     }
   }
 
-  // This method handles the search result selection and automatically confirms
   void _handlePlaceSelection(Prediction prediction) async {
-    if (prediction.description != null) {
-      _searchController.text = prediction.description!;
-      setState(() => _selectedAddress = prediction.description);
-    }
-
-    if (prediction.lat != null && prediction.lng != null) {
-      double lat = double.parse(prediction.lat!);
-      double lng = double.parse(prediction.lng!);
-
-      // Explicitly move the map to the selected location
-      await _updateLocation(LatLng(lat, lng));
-
-      // Add a delay to make sure the map has time to update
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      // Ensure the marker is updated
-      setState(() {});
-
-      // Automatically confirm this address and close the sheet
-      _confirmAddress();
-    } else {
-      // If lat/lng not available, try to get coordinates from the address
-      try {
-        List<Location> locations = await locationFromAddress(
-          prediction.description ?? "",
-        );
-        if (locations.isNotEmpty) {
-          await _updateLocation(
-            LatLng(locations.first.latitude, locations.first.longitude),
-          );
-          setState(() {});
-
-          // Automatically confirm this address and close the sheet
-          _confirmAddress();
-        }
-      } catch (e) {
-        print("Error getting location from address: $e");
-        Get.snackbar('Error', 'Could not find location for this address');
+    try {
+      List<Location> locations = await locationFromAddress(prediction.description!);
+      if (locations.isNotEmpty && mounted) {
+        LatLng newLocation = LatLng(locations[0].latitude, locations[0].longitude);
+        await _updateLocation(newLocation);
+        setState(() {
+          _selectedAddress = prediction.description;
+          _searchController.text = prediction.description!;
+        });
+      }
+    } catch (e) {
+      print('Error selecting place: $e');
+      if (mounted) {
+        Get.snackbar('Error', 'Could not fetch location details');
       }
     }
   }
 
-  // Helper method to handle address confirmation
   void _confirmAddress() {
-    if (_selectedAddress != null && _selectedAddress!.isNotEmpty) {
-      widget.onSelectAddress(_selectedAddress!);
+    if (_selectedAddress != null && _selectedAddress!.isNotEmpty && _selectedLocation != null) {
+      widget.onSelectAddress(
+        _selectedAddress!,
+        _selectedLocation!.latitude,
+        _selectedLocation!.longitude,
+      );
       Navigator.pop(context);
+    } else {
+      Get.snackbar('Error', 'Please select a valid address');
     }
   }
 
@@ -198,9 +165,9 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.whiteTheme,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
@@ -230,8 +197,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
                 hintText: 'Search location...',
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon:
-                _searchController.text.isNotEmpty
+                suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
@@ -247,13 +213,11 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
               itemClick: _handlePlaceSelection,
             ),
           ),
-
-          SizedBox(height: 10,),
+          const SizedBox(height: 10),
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child:
-              _isLoading
+              child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : GoogleMap(
                 mapType: MapType.hybrid,
@@ -261,26 +225,18 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
                   _mapController = controller;
                   if (_selectedLocation != null) {
                     controller.animateCamera(
-                      CameraUpdate.newLatLngZoom(
-                        _selectedLocation!,
-                        16,
-                      ),
+                      CameraUpdate.newLatLngZoom(_selectedLocation!, 16),
                     );
                   }
                 },
                 initialCameraPosition: CameraPosition(
-                  target:
-                  _selectedLocation ??
-                      const LatLng(31.5204, 74.3587),
-                  zoom: 20,
+                  target: _selectedLocation ?? const LatLng(31.5204, 74.3587),
+                  zoom: 16,
                 ),
-                markers:
-                _selectedLocation != null
+                markers: _selectedLocation != null
                     ? {
                   Marker(
-                    markerId: const MarkerId(
-                      'selected_location',
-                    ),
+                    markerId: const MarkerId('selected_location'),
                     position: _selectedLocation!,
                     infoWindow: InfoWindow(
                       title: "Selected Location",
@@ -301,43 +257,41 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
               ),
             ),
           ),
-
-          // Selected Address Preview
-          // if (_selectedAddress != null && _selectedAddress!.isNotEmpty)
-          //   Padding(
-          //     padding: const EdgeInsets.symmetric(
-          //       vertical: 16.0,
-          //       horizontal: 8,
-          //     ),
-          //     child: Container(
-          //       padding: const EdgeInsets.all(12),
-          //       decoration: BoxDecoration(
-          //         color: Colors.grey[100],
-          //         borderRadius: BorderRadius.circular(8),
-          //         border: Border.all(color: Colors.grey[300]!),
-          //       ),
-          //       child: Column(
-          //         crossAxisAlignment: CrossAxisAlignment.start,
-          //         children: [
-          //           const Text(
-          //             "Selected Address:",
-          //             style: TextStyle(
-          //               fontWeight: FontWeight.bold,
-          //               fontSize: 14,
-          //             ),
-          //           ),
-          //           const SizedBox(height: 4),
-          //           Text(
-          //             _selectedAddress!,
-          //             style: const TextStyle(fontSize: 16),
-          //           ),
-          //         ],
-          //       ),
-          //     ),
-          //   ),
-
-          // Tap instruction
-
+          if (_selectedAddress != null && _selectedAddress!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Selected Address:",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(_selectedAddress!, style: const TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: _confirmAddress,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.darkBlueShade,
+                foregroundColor: AppColors.whiteTheme,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('Confirm Address', style: TextStyle(fontSize: 18)),
+            ),
+          ),
         ],
       ),
     );

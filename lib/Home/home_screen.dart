@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/widgets/custom_text.dart';
+import 'package:untitled2/Controlller/add_address_controller.dart';
 import 'categories_page.dart';
 import 'maintenance_page.dart';
 import 'offer_page.dart';
 import 'ViewAllServices/home_services_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   final double latitude;
   final double longitude;
@@ -27,15 +30,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final AddAddressController addAddressController = Get.find<AddAddressController>();
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: AppColors.whiteTheme,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Column(
+        backgroundColor: AppColors.darkBlueShade,
+        title: Obx(() => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -43,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icon(
                   widget.isManualLocation ? Icons.location_on : Icons.my_location,
                   size: 20,
-                  color: AppColors.darkBlueShade,
+                  color: Colors.white,
                 ),
                 SizedBox(width: 8),
                 Expanded(
@@ -51,13 +58,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CustomText(
-                        text: widget.city ?? 'Current Location',
+                        text: addAddressController.currentAddress.value.isNotEmpty
+                            ? addAddressController.currentAddress.value
+                            : (widget.city ?? 'Select Location'),
                         fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 16.px,
                       ),
                       CustomText(
-                        text: widget.address ?? 'Address not available',
+                        text: addAddressController.currentAddress.value.isNotEmpty
+                            ? addAddressController.currentAddress.value
+                            : (widget.address ?? 'Address not available'),
                         fontSize: 12.px,
-                        color: AppColors.hintGrey,
+                        color: Colors.white70,
                       ),
                     ],
                   ),
@@ -65,21 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ],
-        ),
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(Icons.notifications),
-        //     onPressed: () {
-        //       // Navigate to notifications
-        //     },
-        //   ),
-        //   IconButton(
-        //     icon: Icon(Icons.shopping_cart),
-        //     onPressed: () {
-        //       // Navigate to cart
-        //     },
-        //   ),
-        // ],
+        )),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -91,36 +90,21 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Welcome To Our App',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue[900],
-                    ),
+                  CustomText(
+                    text: 'Welcome To Our App',
+                    fontSize: 24.px,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.darkBlueShade,
                   ),
                   SizedBox(height: 5),
-                  Text(
-                    'Find the best services for your needs',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  CustomText(
+                    text: 'Find the best services for your needs',
+                    fontSize: 14.px,
+                    color: AppColors.hintGrey,
                   ),
                 ],
               ),
             ),
-
-            // Location Type Indicator
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 20),
-            //   child: Chip(
-            //     label: Text(
-            //       widget.isManualLocation ? 'Manual Location' : 'Current Location',
-            //       style: TextStyle(color: Colors.white),
-            //     ),
-            //     backgroundColor: widget.isManualLocation
-            //         ? Colors.orange
-            //         : Colors.green,
-            //   ),
-            // ),
             SizedBox(height: 10),
 
             // Rest of your home screen content...
@@ -136,13 +120,11 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "Categories",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+                  CustomText(
+                    text: "Categories",
+                    fontSize: 18.px,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.darkBlueShade,
                   ),
                   InkWell(
                     onTap: () {
@@ -164,13 +146,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Row(
                         children: [
-                          Text(
-                            "View All",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue[800],
-                            ),
+                          CustomText(
+                            text: "View All",
+                            fontSize: 14.px,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue[800],
                           ),
                           SizedBox(width: 4),
                           Icon(
@@ -186,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(height: height * 0.020),
-               CategoriesGrid(),
+            CategoriesGrid(),
             SizedBox(height: height * 0.030),
 
             // Maintenance Banner

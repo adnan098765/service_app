@@ -49,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             TextButton(
               onPressed: () {
 
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>AuthenticationScreen())); // Close the dialog
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>AuthenticationScreen(customerId: 1,))); // Close the dialog
               },
               child: Text("OK", style: TextStyle(color: AppColors.blackColor)),
             ),
