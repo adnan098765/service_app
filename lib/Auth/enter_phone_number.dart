@@ -1,11 +1,13 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:untitled2/AppColors/app_colors.dart';
-import 'package:untitled2/widgets/custom_container.dart';
-import 'package:untitled2/widgets/custom_text.dart';
-
+import 'package:responsive_sizer/responsive_sizer.dart';
+import '../AppColors/app_colors.dart';
 import '../Controlller/phone_number_controller.dart';
+import '../widgets/custom_text.dart';
+
+import 'authentication_screen.dart';
 
 class EnterPhoneNumber extends StatelessWidget {
   const EnterPhoneNumber({super.key});
@@ -20,24 +22,24 @@ class EnterPhoneNumber extends StatelessWidget {
       backgroundColor: AppColors.whiteTheme,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: EdgeInsets.all(Adaptive.w(4)),
           child: SafeArea(
             child: Form(
               key: controller.formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: height * 0.04),
+                  SizedBox(height: Adaptive.h(4)),
                   CustomText(
                     text: "Welcome to our company",
-                    fontSize: 22,
+                    fontSize: 22.sp,
                     fontWeight: FontWeight.bold,
                   ),
                   CustomText(
                     text: "Please enter your phone number to continue",
-                    fontSize: 16,
+                    fontSize: 16.sp,
                   ),
-                  SizedBox(height: height * 0.040),
+                  SizedBox(height: Adaptive.h(4)),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -84,62 +86,71 @@ class EnterPhoneNumber extends StatelessWidget {
                         hintText: "3XX XXXXXXX",
                         hintStyle: TextStyle(color: Colors.grey[600]),
                         prefixIcon: Padding(
-                          padding: const EdgeInsets.only(left: 10, right: 5),
+                          padding: EdgeInsets.only(left: Adaptive.w(2), right: Adaptive.w(1)),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Image.asset(
                                 'assets/images/img_3.png',
-                                width: 30,
-                                height: 30,
+                                width: Adaptive.w(8),
+                                height: Adaptive.w(8),
                               ),
-                              const SizedBox(width: 5),
-                              const Text(
+                              SizedBox(width: Adaptive.w(1)),
+                              Text(
                                 '+92',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 16.sp,
                                   color: Colors.black,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15,
-                          horizontal: 15,
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: Adaptive.h(2),
+                          horizontal: Adaptive.w(4),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: height * 0.020),
+                  SizedBox(height: Adaptive.h(2)),
                   Obx(() => GestureDetector(
                     onTap: controller.isPhoneValid.value
                         ? () => controller.verifyPhoneNumber(context)
                         : null,
                     child: controller.isLoading.value
-                        ? const Center(child: CircularProgressIndicator())
-                        : CustomContainer(
-                      height: height * 0.0550,
+                        ? Center(child: CircularProgressIndicator())
+                        : Container(
+                      height: Adaptive.h(5.5),
                       width: width,
-                      color: controller.isPhoneValid.value
-                          ? AppColors.buttonColor
-                          : Colors.grey,
-                      borderRadius: 15,
+                      decoration: BoxDecoration(
+                        color: controller.isPhoneValid.value
+                            ? AppColors.buttonColor
+                            : Colors.grey,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
                       child: Center(
                         child: CustomText(
                           text: "Continue",
-                          fontSize: 18,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColors.whiteTheme,
                         ),
                       ),
                     ),
                   )),
-                  SizedBox(height: height * 0.050),
+                  SizedBox(height: Adaptive.h(5)),
                   Center(
                     child: CustomText(
                       text: "By Continuing, you agree to our company's ",
-                      fontSize: 14,
+                      fontSize: 14.sp,
                       color: AppColors.hintGrey,
                     ),
                   ),
@@ -147,14 +158,14 @@ class EnterPhoneNumber extends StatelessWidget {
                     child: RichText(
                       text: TextSpan(
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 14.sp,
                           color: AppColors.blackColor,
                         ),
                         children: [
-                          const TextSpan(
+                          TextSpan(
                             text: 'Terms & conditions ',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
                             ),
@@ -162,14 +173,14 @@ class EnterPhoneNumber extends StatelessWidget {
                           TextSpan(
                             text: 'and accept our ',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 14.sp,
                               color: AppColors.blackColor,
                             ),
                           ),
-                          const TextSpan(
+                          TextSpan(
                             text: 'privacy policy',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
                             ),
@@ -178,7 +189,7 @@ class EnterPhoneNumber extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: height * 0.050),
+                  SizedBox(height: Adaptive.h(5)),
                 ],
               ),
             ),

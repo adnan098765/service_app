@@ -62,6 +62,7 @@ dependencies:
   flutter_date_pickers: ^0.4.3
   get:
   http:
+  get_storage: ^2.1.1
 #  dio:
 #  intl:
   geocoding: ^3.0.0

@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
+import 'package:untitled2/CheckOut/schedule_section.dart';
 import 'package:untitled2/CheckOut/service_card.dart';
 import 'package:untitled2/CheckOut/total_price.dart';
-import 'package:untitled2/CheckOut/schedule_section.dart';
 import 'package:untitled2/widgets/custom_container.dart';
 import 'package:untitled2/widgets/custom_text.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../Controlller/add_address_controller.dart';
+import '../Models/all_category_services.dart';
 import 'address_selection.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final Map<String, int> selectedServices;
+  final List<Map<String, Object>> selectedServiceDetails;
 
-  const CheckoutScreen({super.key, required this.selectedServices});
+  const CheckoutScreen({
+    super.key,
+    required this.selectedServices,
+    required this.selectedServiceDetails,
+  });
 
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
@@ -24,21 +30,15 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   DateTime? _selectedDate;
   String? _selectedTime;
-  final String _googleMapsApiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with dotenv.env['GOOGLE_MAPS_API_KEY']!
+  final String _googleMapsApiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with actual API key
   late final AddAddressController _addressController;
-
-  final Map<String, int> servicePrices = {
-    "AC Dismounting": 1000,
-    "AC General Service": 1850,
-    "AC repairing": 1850,
-    "Floor standing cabinet Ac general service": 1850,
-  };
 
   @override
   void initState() {
     super.initState();
     _addressController = Get.put(AddAddressController());
     _getCurrentLocation();
+    debugPrint('CheckoutScreen: Initialized with selectedServices=${widget.selectedServices}, selectedServiceDetails=${widget.selectedServiceDetails}');
   }
 
   Future<void> _getCurrentLocation() async {
@@ -48,6 +48,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         _addressController.currentAddress.value = "Location services are disabled";
+        debugPrint('CheckoutScreen: Location services disabled');
         return;
       }
 
@@ -56,16 +57,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           _addressController.currentAddress.value = "Location permissions are denied";
+          debugPrint('CheckoutScreen: Location permissions denied');
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
         _addressController.currentAddress.value = "Location permissions are permanently denied";
+        debugPrint('CheckoutScreen: Location permissions permanently denied');
         return;
       }
 
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      debugPrint('CheckoutScreen: Got position: lat=${position.latitude}, lng=${position.longitude}');
 
       String url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$_googleMapsApiKey';
 
@@ -83,15 +87,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             longitude: position.longitude,
             isDefault: _addressController.savedAddresses.isEmpty,
           );
+          debugPrint('CheckoutScreen: Fetched address: $fetchedAddress');
         } else {
           _addressController.currentAddress.value = "Unable to fetch detailed address";
+          debugPrint('CheckoutScreen: Failed to fetch address, status=${data['status']}');
         }
       } else {
         _addressController.currentAddress.value = "Error connecting to location service";
+        debugPrint('CheckoutScreen: HTTP error: ${response.statusCode}');
       }
     } catch (e) {
       _addressController.currentAddress.value = "Error fetching location. Please try again.";
-      print("Location error: $e");
+      debugPrint('CheckoutScreen: Location error: $e');
     }
   }
 
@@ -99,10 +106,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Checkout", style: TextStyle(color: AppColors.whiteTheme)),
+        title: const Text("Checkout", style: TextStyle(color: AppColors.whiteTheme)),
         centerTitle: true,
         backgroundColor: AppColors.darkBlueShade,
-        iconTheme: IconThemeData(color: AppColors.whiteTheme),
+        iconTheme: const IconThemeData(color: AppColors.whiteTheme),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -117,40 +124,55 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   _selectedDate = date;
                   _selectedTime = null;
                 });
+                debugPrint('CheckoutScreen: Selected date: $date');
               },
               onTimeSelected: (time) {
                 setState(() => _selectedTime = time);
+                debugPrint('CheckoutScreen: Selected time: $time');
               },
             ),
             const SizedBox(height: 24),
             _buildAddressSection(),
             const SizedBox(height: 24),
-            Text(
+            const Text(
               "Services list",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            ...widget.selectedServices.entries.map((entry) => ServiceCard(
-              title: entry.key,
-              description: "Per AC (1 to 2.5 tons)",
-              originalPrice: "Rs. 1200",
-              discountedPrice: "Rs. ${servicePrices[entry.key]!.toString()}",
-              rating: 4.8,
-              count: entry.value,
-              onQuantityChanged: (newCount) {
-                setState(() {
-                  if (newCount == 0) {
-                    widget.selectedServices.remove(entry.key);
-                  } else {
-                    widget.selectedServices[entry.key] = newCount;
-                  }
-                });
-              },
-            )),
+            ...widget.selectedServices.entries.map((entry) {
+              // Find the service details from selectedServiceDetails
+              final serviceDetail = widget.selectedServiceDetails.firstWhere(
+                    (detail) => (detail['service'] as Services?)?.serviceName == entry.key,
+                orElse: () => <String, Object>{'service': entry.key, 'quantity': 0},
+              );
+              final service = serviceDetail['service'] as Services?;
+              if (service == null) {
+                debugPrint('CheckoutScreen: No service details found for ${entry.key}');
+                return const SizedBox.shrink();
+              }
+              return ServiceCard(
+                title: entry.key,
+                description: service.description ?? 'No description',
+                originalPrice: 'Rs. ${service.regularPrice ?? '0'}',
+                discountedPrice: 'Rs. ${service.salePrice ?? service.regularPrice ?? '0'}',
+                rating: service.isFeatured == true ? 4.8 : 4.3,
+                count: entry.value,
+                onQuantityChanged: (newCount) {
+                  setState(() {
+                    if (newCount == 0) {
+                      widget.selectedServices.remove(entry.key);
+                    } else {
+                      widget.selectedServices[entry.key] = newCount;
+                    }
+                  });
+                  debugPrint('CheckoutScreen: Updated quantity for ${entry.key} to $newCount');
+                },
+              );
+            }),
             const SizedBox(height: 24),
             TotalPriceCard(
               selectedServices: widget.selectedServices,
-              servicePrices: servicePrices,
+              selectedServiceDetails: widget.selectedServiceDetails,
             ),
             const SizedBox(height: 24),
             Obx(() => GestureDetector(
@@ -180,10 +202,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 }
 
                 // Simulate order placement (replace with actual API call)
-                print("Order Details:");
-                print("Services: ${widget.selectedServices}");
-                print("Address: ${_addressController.currentAddress.value}");
-                print("Date: $_selectedDate, Time: $_selectedTime");
+                debugPrint('CheckoutScreen: Order Details:');
+                debugPrint('Services: ${widget.selectedServices}');
+                debugPrint('Service Details: ${widget.selectedServiceDetails}');
+                debugPrint('Address: ${_addressController.currentAddress.value}');
+                debugPrint('Date: $_selectedDate, Time: $_selectedTime');
 
                 Get.snackbar(
                   "Gee Hazir Janab",
@@ -204,7 +227,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ? CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(AppColors.whiteTheme),
                   )
-                      : CustomText(
+                      : const CustomText(
                     text: "Place Order",
                     color: AppColors.whiteTheme,
                     fontSize: 22,
@@ -223,7 +246,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Address",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
@@ -253,17 +276,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Text("Fetching your location", style: TextStyle(fontSize: 16)),
+                        const Text("Fetching your location", style: TextStyle(fontSize: 16)),
                       ],
                     )
                         : Text(
                       _addressController.currentAddress.value.isEmpty
                           ? "No address selected"
                           : _addressController.currentAddress.value,
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 5),
-                    Text(
+                    const Text(
                       "Tap edit to change address",
                       style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
@@ -298,7 +321,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         },
         savedAddresses: _addressController.getAddressesForUI(),
         onAddNewAddress: () {
-          print("Add new address requested");
+          debugPrint('CheckoutScreen: Add new address requested');
         },
       ),
     );
@@ -313,8 +336,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         longitude: longitude,
         isDefault: _addressController.savedAddresses.isEmpty,
       );
+      debugPrint('CheckoutScreen: Saved address: $address');
     } catch (e) {
-      print("Error saving selected address: $e");
+      debugPrint('CheckoutScreen: Error saving selected address: $e');
       Get.snackbar('Error', 'Failed to save address');
     }
   }

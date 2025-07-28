@@ -1,7 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:untitled2/AppColors/app_colors.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:untitled2/Auth/authentication_screen.dart';
+import '../Auth/enter_phone_number.dart';
+import '../BottomNavBar/bottom_nav_screen.dart';
 import '../OnboardingPage/onboarding_screen.dart';
+import '../SharedPreference/shared_preference.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,9 +18,9 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _opacityAnimation;
-  late Animation<double> _scaleAnimation;
-  late Animation<Offset> _textSlideAnimation;
+  late Animation<double> _animation;
+  final box = GetStorage();
+  bool _navigated = false;
 
   @override
   void initState() {
@@ -23,35 +28,31 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 2),
     );
 
-    // Fade in animation
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
-
-    // Scale animation
-    _scaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
-
-    // Text slide animation
-    _textSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.decelerate));
-
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
-    // Navigate after animations complete + delay
-    Timer(const Duration(seconds: 4), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => OnboardingScreen()),
-      );
+    Timer(const Duration(seconds: 3), () async {
+      if (_navigated) return;
+      _navigated = true;
+
+      bool hasSeenOnboarding = box.read('hasSeenOnboarding') ?? false;
+      bool isLoggedIn = box.read('isLoggedIn') ?? false;
+
+      if (hasSeenOnboarding && isLoggedIn) {
+        int? customerId = await SharedPreferencesHelper.getUserId();
+        if (customerId != null) {
+          Get.offAll(() => AuthenticationScreen(customerId: customerId));
+        } else {
+          Get.offAll(() => const EnterPhoneNumber());
+        }
+      } else if (hasSeenOnboarding && !isLoggedIn) {
+        Get.offAll(() => const EnterPhoneNumber());
+      } else {
+        Get.offAll(() => const OnboardingScreen());
+      }
     });
   }
 
@@ -63,67 +64,17 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      backgroundColor: AppColors.blackColor,
-      body: Stack(
-        children: [
-          // Background Image
-          Container(
-            height: height,
-            width: width,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/art work.jpg"),
-                fit: BoxFit.cover,
-              ),
-            ),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: FadeTransition(
+          opacity: _animation,
+          child: Image.asset(
+            'assets/images/Gee hazir jnab-01.png',
+            width: 150,
+            height: 150,
           ),
-
-          // Animated Logo/Text
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FadeTransition(
-                  opacity: _opacityAnimation,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Image.asset(
-                      "assets/images/Gee hazir jnab-01.png",
-                      width: width * 0.4,
-                    ),
-                  ),
-                ),
-                SizedBox(height: height * 0.02),
-                // SlideTransition(
-                //   position: _textSlideAnimation,
-                //   child: FadeTransition(
-                //     opacity: _opacityAnimation,
-                //     child: Text(
-                //       "Tech Bees\nEnterprises",
-                //       textAlign: TextAlign.center,
-                //       style: TextStyle(
-                //         fontSize: 28,
-                //         fontWeight: FontWeight.bold,
-                //         color: Colors.white,
-                //         shadows: [
-                //           Shadow(
-                //             blurRadius: 10,
-                //             color: Colors.black.withOpacity(0.5),
-                //             offset: Offset(2, 2),
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                // ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -28,7 +28,7 @@ class AddressSelectionSheet extends StatefulWidget {
 
 class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
   // Use environment variable for API key (assumes flutter_dotenv is set up)
-  final String googleApiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // Replace with dotenv.env['GOOGLE_MAPS_API_KEY']!
+  final String googleApiKey = "AIzaSyBYJbjMnqYFSQ1lssqHH4A52HWD1H13FtI"; // Replace with dotenv.env['GOOGLE_MAPS_API_KEY']!
   final TextEditingController _searchController = TextEditingController();
   late final AddAddressController _addressController;
   LatLng? _selectedLocation;

@@ -29,10 +29,30 @@ class SharedPreferencesHelper {
     return profileString != null ? jsonDecode(profileString) : null;
   }
 
+  static Future<void> setAuthToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+    debugPrint('[SharedPreferencesHelper] Set auth_token: $token');
+  }
+
+  static Future<String?> getAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    debugPrint('[SharedPreferencesHelper] Get auth_token: $token');
+    return token;
+  }
+
+  static Future<void> removeAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    debugPrint('[SharedPreferencesHelper] Removed auth_token');
+  }
+
   static Future<void> clearUserData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('userId');
     await prefs.remove('userProfile');
+    await prefs.remove('auth_token');
     debugPrint('[SharedPreferencesHelper] Cleared user data');
   }
 }

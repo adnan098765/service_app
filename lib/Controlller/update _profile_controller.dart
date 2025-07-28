@@ -1,13 +1,16 @@
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:untitled2/constants/app_urls.dart';
+import '../BottomNavBar/bottom_nav_screen.dart';
 import '../DatabaseHelper/database_helper.dart';
 import '../Models/update_profile_model.dart';
+import '../SharedPreference/shared_preference.dart';
+import '../constants/app_urls.dart';
 import '../google_map/map_screen.dart';
-import '../BottomNavBar/bottom_nav_screen.dart';
+
 
 class ProfileController extends GetxController {
   var isLoading = false.obs;
@@ -23,8 +26,8 @@ class ProfileController extends GetxController {
     required String secondName,
     required String email,
     required String gender,
-    required int customerId, // Use passed customerId
-    required String? token, // Use passed token
+    required int customerId,
+    required String? token,
   }) async {
     isLoading.value = true;
     debugPrint('🟢 [ProfileController] Starting updateProfile for +92$phoneNumber, customerId: $customerId');
@@ -48,16 +51,22 @@ class ProfileController extends GetxController {
       }
 
       final fullPhone = '+92$phoneNumber';
-      // Store customerId and token in SharedPreferences and DatabaseHelper
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('userId', customerId);
-      if (token != null) {
-        await prefs.setString('auth_token', token);
-      }
-      await _dbHelper.createUser(phoneNumber, customerId, token);
-      debugPrint('[ProfileController] Saved: customerId: $customerId, token: $token for +92$phoneNumber');
 
-      final url = Uri.parse(AppUrls.updateProfile);
+      /// ✅ Use helper to store userId, token, profile
+      await SharedPreferencesHelper.setUserId(customerId);
+      if (token != null) await SharedPreferencesHelper.setAuthToken(token);
+      await SharedPreferencesHelper.setUserProfile({
+        'first_name': firstName,
+        'last_name': secondName,
+        'email': email,
+        'gender': gender,
+      });
+
+      /// ✅ Also store in local DB (optional)
+      await _dbHelper.createUser(phoneNumber, customerId, token);
+      debugPrint('[ProfileController] Stored locally: ID: $customerId, token: $token');
+
+      final url = AppUrls.updateProfile;
       final headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -72,11 +81,11 @@ class ProfileController extends GetxController {
       });
 
       debugPrint('[ProfileController] POST request to: $url');
-      debugPrint('[ProfileController] Request Headers: $headers');
-      debugPrint('[ProfileController] Request Body: $body');
+      debugPrint('[ProfileController] Headers: $headers');
+      debugPrint('[ProfileController] Body: $body');
 
       final response = await http.post(
-        url,
+        Uri.parse(url),
         body: body,
         headers: headers,
       ).timeout(const Duration(seconds: 10), onTimeout: () {
@@ -90,7 +99,7 @@ class ProfileController extends GetxController {
         final updateProfile = UpdateProfile.fromJson(data);
 
         if (updateProfile.token != null) {
-          await prefs.setString('auth_token', updateProfile.token!);
+          await SharedPreferencesHelper.setAuthToken(updateProfile.token!);
           await _dbHelper.updateUserToken(phoneNumber, updateProfile.token!);
           debugPrint('[ProfileController] Token updated: ${updateProfile.token}');
         }
@@ -117,11 +126,16 @@ class ProfileController extends GetxController {
           ));
         }
       } else {
-        final data = jsonDecode(response.body);
-        String errorMessage = data['message'] ?? 'Failed to update profile';
-        if (data['errors'] != null && data['errors'] is Map) {
-          final errors = data['errors'] as Map<String, dynamic>;
-          errorMessage = errors.values.expand((e) => e as List).join(', ');
+        String errorMessage = 'Failed to update profile';
+        try {
+          final data = jsonDecode(response.body);
+          errorMessage = data['message'] ?? errorMessage;
+          if (data['errors'] != null && data['errors'] is Map) {
+            final errors = data['errors'] as Map<String, dynamic>;
+            errorMessage = errors.values.expand((e) => e as List).join(', ');
+          }
+        } catch (e) {
+          debugPrint('[ProfileController] Error parsing response: $e');
         }
         debugPrint('[ProfileController] Error: $errorMessage');
         Get.snackbar('Error', errorMessage);
@@ -134,4 +148,5 @@ class ProfileController extends GetxController {
       debugPrint('[ProfileController] updateProfile completed');
     }
   }
+
 }

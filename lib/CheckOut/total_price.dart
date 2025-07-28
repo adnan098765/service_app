@@ -1,79 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
 import 'package:untitled2/widgets/custom_text.dart';
+import '../Models/all_category_services.dart';
 
 class TotalPriceCard extends StatelessWidget {
   final Map<String, int> selectedServices;
-  final Map<String, int> servicePrices;
+  final List<Map<String, Object>> selectedServiceDetails;
 
   const TotalPriceCard({
+    super.key,
     required this.selectedServices,
-    required this.servicePrices,
+    required this.selectedServiceDetails,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      borderRadius: BorderRadius.circular(14),
-      color: AppColors.lightGrey,
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            ...selectedServices.entries.map((entry) {
-              final serviceName = entry.key;
-              final quantity = entry.value;
-              final price = servicePrices[serviceName] ?? 0;
-              final total = price * quantity;
+    // Calculate total price using selectedServiceDetails
+    double totalPrice = selectedServiceDetails.fold(0.0, (sum, item) {
+      final service = item['service'] as Services?;
+      final quantity = item['quantity'] as int? ?? 0;
+      final price = double.tryParse(service?.salePrice ?? service?.regularPrice ?? '0') ?? 0.0;
+      return sum + (price * quantity);
+    });
 
-              return Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomText(text: serviceName, fontSize: 14),
-                      ),
-                      CustomText(
-                        text: "$quantity × Rs. $price = Rs. $total",
-                        fontSize: 14,
-                      ),
-                    ],
-                  ),
-                  if (entry.key != selectedServices.entries.last.key)
-                    Divider(),
-                ],
-              );
-            }),
-            Divider(thickness: 2),
-            Row(
-              children: [
-                CustomText(
-                  text: "Total Price",
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-                Spacer(),
-                CustomText(
-                  text: "Rs. ${_calculateTotalPrice()}",
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ],
+    debugPrint('TotalPriceCard: Calculated totalPrice=$totalPrice for selectedServices=$selectedServices, selectedServiceDetails=$selectedServiceDetails');
+
+    return Card(
+      color: AppColors.whiteTheme,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+             CustomText(
+              text: 'Total Price',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.darkBlueShade,
+            ),
+            CustomText(
+              text: 'Rs. ${totalPrice.toStringAsFixed(2)}',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.appColor,
             ),
           ],
         ),
       ),
     );
-  }
-
-  int _calculateTotalPrice() {
-    int total = 0;
-    selectedServices.forEach((service, quantity) {
-      if (servicePrices.containsKey(service)) {
-        total += servicePrices[service]! * quantity;
-      }
-    });
-    return total;
   }
 }

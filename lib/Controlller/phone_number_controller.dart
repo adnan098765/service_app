@@ -1,18 +1,21 @@
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../Auth/otp_screen.dart';
+import '../DatabaseHelper/database_helper.dart';
+import '../Models/send_otp_model.dart';
 import '../Models/user_created_model.dart';
 import '../constants/app_urls.dart';
-import '../models/send_otp_model.dart';
-import '../DatabaseHelper/database_helper.dart';
+
 
 class PhoneNumberController extends GetxController {
   final TextEditingController phoneNumberController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   var isPhoneValid = false.obs;
   var isLoading = false.obs;
+  var isExistingCustomer = false.obs;
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
   @override
@@ -59,7 +62,6 @@ class PhoneNumberController extends GetxController {
     debugPrint("🚀 [PhoneNumberController] Verifying phone: $fullPhone");
 
     try {
-      /// STEP 1: Check/Create User
       debugPrint("🌐 [PhoneNumberController] POST → ${AppUrls.userCreated}");
       final checkUserResponse = await http.post(
         Uri.parse(AppUrls.userCreated),
@@ -80,12 +82,11 @@ class PhoneNumberController extends GetxController {
 
         if (createUserModel.success == true) {
           debugPrint(
-              "✅ [PhoneNumberController] CheckUser Success → Customer ID: ${createUserModel.customerId}, Token: ${createUserModel.token}");
-          // Store in DatabaseHelper
-          await _dbHelper.createUser(phoneNumberController.text, createUserModel.customerId ?? 0,
-              createUserModel.token);
+              "✅ [PhoneNumberController] CheckUser Success → Customer ID: ${createUserModel.customerId}, Token: ${createUserModel.token}, Customer Type: ${createUserModel.customerType}");
+          isExistingCustomer.value = createUserModel.customerType == 'existing_customer';
 
-          /// STEP 2: Send OTP
+          await _dbHelper.createUser(phoneNumberController.text, createUserModel.customerId ?? 0, createUserModel.token);
+
           await Future.delayed(const Duration(milliseconds: 500));
           debugPrint("📡 [PhoneNumberController] Sending OTP to $fullPhone");
 

@@ -1,3 +1,4 @@
+
 class AllCategoryServices {
   bool? success;
   Data? data;
@@ -5,13 +6,13 @@ class AllCategoryServices {
   AllCategoryServices({this.success, this.data});
 
   AllCategoryServices.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    success = json['success'] ?? false;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
+    final Map<String, dynamic> data = {};
+    data['success'] = success;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -20,34 +21,42 @@ class AllCategoryServices {
 }
 
 class Data {
-  Category? category;
+  List<Category>? categories;
   List<Services>? services;
   int? totalServices;
 
-  Data({this.category, this.services, this.totalServices});
+  Data({this.categories, this.services, this.totalServices});
 
   Data.fromJson(Map<String, dynamic> json) {
-    category = json['category'] != null
-        ? new Category.fromJson(json['category'])
-        : null;
-    if (json['services'] != null) {
-      services = <Services>[];
-      json['services'].forEach((v) {
-        services!.add(new Services.fromJson(v));
-      });
+    // Handle both 'categories' and 'category' fields
+    if (json['categories'] != null && json['categories'] is List) {
+      categories = (json['categories'] as List)
+          .map((e) => Category.fromJson(e))
+          .toList();
+    } else if (json['category'] != null && json['category'] is Map) {
+      categories = [Category.fromJson(json['category'])];
+    } else {
+      categories = [];
     }
-    totalServices = json['total_services'];
+    if (json['services'] != null && json['services'] is List) {
+      services = (json['services'] as List)
+          .map((v) => Services.fromJson(v))
+          .toList();
+    } else {
+      services = [];
+    }
+    totalServices = json['total_services'] ?? 0;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.category != null) {
-      data['category'] = this.category!.toJson();
+    final Map<String, dynamic> data = {};
+    if (categories != null) {
+      data['categories'] = categories!.map((e) => e.toJson()).toList();
     }
-    if (this.services != null) {
-      data['services'] = this.services!.map((v) => v.toJson()).toList();
+    if (services != null) {
+      data['services'] = services!.map((v) => v.toJson()).toList();
     }
-    data['total_services'] = this.totalServices;
+    data['total_services'] = totalServices;
     return data;
   }
 }
@@ -66,10 +75,10 @@ class Category {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['category_name'] = this.categoryName;
-    data['image'] = this.image;
+    final Map<String, dynamic> data = {};
+    data['id'] = id;
+    data['category_name'] = categoryName;
+    data['image'] = image;
     return data;
   }
 }
@@ -79,65 +88,47 @@ class Services {
   String? serviceName;
   String? description;
   String? regularPrice;
-  Null? salePrice;
+  String? salePrice;
   String? image;
   bool? isFeatured;
   Category? category;
 
-  Services(
-      {this.id,
-        this.serviceName,
-        this.description,
-        this.regularPrice,
-        this.salePrice,
-        this.image,
-        this.isFeatured,
-        this.category});
+  Services({
+    this.id,
+    this.serviceName,
+    this.description,
+    this.regularPrice,
+    this.salePrice,
+    this.image,
+    this.isFeatured,
+    this.category,
+  });
 
   Services.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     serviceName = json['service_name'];
     description = json['description'];
-    regularPrice = json['regular_price'];
-    salePrice = json['sale_price'];
+    regularPrice = json['regular_price']?.toString();
+    salePrice = json['sale_price']?.toString();
     image = json['image'];
     isFeatured = json['is_featured'];
     category = json['category'] != null
-        ? new Category.fromJson(json['category'])
+        ? Category.fromJson(json['category'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['service_name'] = this.serviceName;
-    data['description'] = this.description;
-    data['regular_price'] = this.regularPrice;
-    data['sale_price'] = this.salePrice;
-    data['image'] = this.image;
-    data['is_featured'] = this.isFeatured;
-    if (this.category != null) {
-      data['category'] = this.category!.toJson();
+    final Map<String, dynamic> data = {};
+    data['id'] = id;
+    data['service_name'] = serviceName;
+    data['description'] = description;
+    data['regular_price'] = regularPrice;
+    data['sale_price'] = salePrice;
+    data['image'] = image;
+    data['is_featured'] = isFeatured;
+    if (category != null) {
+      data['category'] = category!.toJson();
     }
-    return data;
-  }
-}
-
-class Category1 {
-  int? id;
-  String? categoryName;
-
-  Category1({this.id, this.categoryName});
-
-  Category1.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    categoryName = json['category_name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['category_name'] = this.categoryName;
     return data;
   }
 }

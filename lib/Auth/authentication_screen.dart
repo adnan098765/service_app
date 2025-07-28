@@ -1,11 +1,13 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:untitled2/AppColors/app_colors.dart';
-import 'package:untitled2/widgets/custom_container.dart';
-import 'package:untitled2/widgets/custom_text.dart';
-
+import 'package:responsive_sizer/responsive_sizer.dart';
+import '../AppColors/app_colors.dart';
 import '../Controlller/update _profile_controller.dart';
+import '../SharedPreference/shared_preference.dart';
+import '../widgets/custom_text.dart';
+
 
 class AuthenticationScreen extends StatefulWidget {
   final int customerId;
@@ -36,12 +38,25 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   void initState() {
     super.initState();
     debugPrint("🟢 [AuthenticationScreen] Initialized with phoneNumber: ${widget.phoneNumber}, customerId: ${widget.customerId}");
+    _loadUserProfile();
     if (widget.phoneNumber != null && widget.phoneNumber!.isNotEmpty) {
       phoneNumberController.text = widget.phoneNumber!;
       controller.isPhoneValid.value = widget.phoneNumber!.length == 10;
       debugPrint("📱 [AuthenticationScreen] Prefilled phoneNumberController with: ${widget.phoneNumber}");
-    } else {
-      debugPrint("⚠️ [AuthenticationScreen] phoneNumber is null or empty");
+    }
+  }
+
+  Future<void> _loadUserProfile() async {
+    final profile = await SharedPreferencesHelper.getUserProfile();
+    if (profile != null) {
+      firstNameController.text = profile['first_name'] ?? '';
+      secondNameController.text = profile['last_name'] ?? '';
+      emailController.text = profile['email'] ?? '';
+      selectedGender = profile['gender']?.capitalize ?? 'Male';
+      controller.isNameValid.value = firstNameController.text.trim().isNotEmpty && secondNameController.text.trim().isNotEmpty;
+      controller.isSecondNameValid.value = secondNameController.text.trim().isNotEmpty;
+      debugPrint("📋 [AuthenticationScreen] Prefilled profile: $profile");
+      setState(() {});
     }
   }
 
@@ -64,27 +79,26 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
       backgroundColor: AppColors.whiteTheme,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(Adaptive.w(5)),
           child: SafeArea(
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: height * 0.04),
+                  SizedBox(height: Adaptive.h(4)),
                   CustomText(
                     text: "Welcome to our company",
-                    fontSize: 24,
+                    fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColors.appColor,
                   ),
                   CustomText(
                     text: "Please enter your details to continue",
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     color: AppColors.greyColor,
                   ),
-                  SizedBox(height: height * 0.04),
-                  // Phone Number Field (Read-Only)
+                  SizedBox(height: Adaptive.h(4)),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -131,35 +145,34 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                         hintText: "3XX XXXXXXX",
                         hintStyle: TextStyle(color: Colors.grey[600]),
                         prefixIcon: Padding(
-                          padding: const EdgeInsets.only(left: 10, right: 5),
+                          padding: EdgeInsets.only(left: Adaptive.w(2), right: Adaptive.w(1)),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Image.asset(
                                 'assets/images/img_3.png',
-                                width: 30,
-                                height: 30,
+                                width: Adaptive.w(8),
+                                height: Adaptive.w(8),
                               ),
-                              const SizedBox(width: 5),
-                              const Text(
+                              SizedBox(width: Adaptive.w(1)),
+                              Text(
                                 '+92',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 16.sp,
                                   color: Colors.black,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15,
-                          horizontal: 15,
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: Adaptive.h(2),
+                          horizontal: Adaptive.w(4),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: height * 0.025),
-                  // First Name Field
+                  SizedBox(height: Adaptive.h(2.5)),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -202,15 +215,14 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                         hintText: "Enter your first name",
                         hintStyle: TextStyle(color: Colors.grey[600]),
                         prefixIcon: Icon(Icons.person, color: Colors.grey[600]),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15,
-                          horizontal: 15,
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: Adaptive.h(2),
+                          horizontal: Adaptive.w(4),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: height * 0.025),
-                  // Second Name Field
+                  SizedBox(height: Adaptive.h(2.5)),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -254,15 +266,14 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                         hintText: "Enter your last name",
                         hintStyle: TextStyle(color: Colors.grey[600]),
                         prefixIcon: Icon(Icons.person, color: Colors.grey[600]),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15,
-                          horizontal: 15,
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: Adaptive.h(2),
+                          horizontal: Adaptive.w(4),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: height * 0.025),
-                  // Gender Dropdown
+                  SizedBox(height: Adaptive.h(2.5)),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -295,13 +306,13 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                           Icons.person_outline,
                           color: Colors.grey[600],
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 2,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: Adaptive.w(4),
+                          vertical: Adaptive.h(2),
                         ),
                       ),
                       dropdownColor: Colors.grey[200],
-                      style: const TextStyle(fontSize: 16, color: Colors.black87),
+                      style: TextStyle(fontSize: 16.sp, color: Colors.black87),
                       items: ["Male", "Female", "Other"].map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -315,8 +326,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       },
                     ),
                   ),
-                  SizedBox(height: height * 0.025),
-                  // Email Field
+                  SizedBox(height: Adaptive.h(2.5)),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -358,15 +368,14 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                         hintText: "Enter your email",
                         hintStyle: TextStyle(color: Colors.grey[600]),
                         prefixIcon: Icon(Icons.email, color: Colors.grey[600]),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15,
-                          horizontal: 15,
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: Adaptive.h(2),
+                          horizontal: Adaptive.w(4),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: height * 0.04),
-                  // Continue Button
+                  SizedBox(height: Adaptive.h(4)),
                   Obx(() => GestureDetector(
                     onTap: controller.isLoading.value
                         ? null
@@ -386,10 +395,9 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       }
                     },
                     child: controller.isLoading.value
-                        ? const Center(child: CircularProgressIndicator())
-                        : AnimatedContainer(
-                      duration: const Duration(milliseconds: 100),
-                      height: height * 0.06,
+                        ? Center(child: CircularProgressIndicator())
+                        : Container(
+                      height: Adaptive.h(6),
                       width: width,
                       decoration: BoxDecoration(
                         color: (controller.isPhoneValid.value &&
@@ -403,48 +411,29 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
                             blurRadius: 10,
-                            offset: const Offset(0, 5),
+                            offset: Offset(0, 5),
                           ),
                         ],
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            (controller.isPhoneValid.value &&
-                                controller.isNameValid.value &&
-                                controller.isSecondNameValid.value &&
-                                emailController.text.isNotEmpty)
-                                ? AppColors.buttonColor
-                                : Colors.grey,
-                            (controller.isPhoneValid.value &&
-                                controller.isNameValid.value &&
-                                controller.isSecondNameValid.value &&
-                                emailController.text.isNotEmpty)
-                                ? AppColors.buttonColor
-                                : Colors.grey,
-                          ],
-                        ),
                       ),
                       child: Center(
                         child: CustomText(
                           text: "Continue",
-                          fontSize: 18,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColors.whiteTheme,
                         ),
                       ),
                     ),
                   )),
-                  SizedBox(height: height * 0.04),
-                  // Terms Text
+                  SizedBox(height: Adaptive.h(4)),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                      padding: EdgeInsets.symmetric(horizontal: Adaptive.w(4)),
                       child: RichText(
                         text: TextSpan(
-                          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
                           children: [
-                            const TextSpan(text: "By continuing, you agree to our "),
+                            TextSpan(text: "By continuing, you agree to our "),
                             TextSpan(
                               text: "Terms",
                               style: TextStyle(
@@ -452,7 +441,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const TextSpan(text: " and "),
+                            TextSpan(text: " and "),
                             TextSpan(
                               text: "Privacy Policy",
                               style: TextStyle(
@@ -465,7 +454,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: height * 0.02),
+                  SizedBox(height: Adaptive.h(2)),
                 ],
               ),
             ),

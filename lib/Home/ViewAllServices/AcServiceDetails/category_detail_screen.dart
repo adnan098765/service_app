@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:untitled2/CheckOut/check_out_screen.dart';
+import 'package:get/get.dart';
 import 'package:untitled2/AppColors/app_colors.dart';
+import 'package:untitled2/CheckOut/check_out_screen.dart';
+
+import '../../../Controlller/all_category_services.dart';
 import '../../../Models/all_category_services.dart';
+
 
 class CategoryDetailsScreen extends StatefulWidget {
   final Category category;
@@ -20,8 +24,8 @@ class CategoryDetailsScreen extends StatefulWidget {
 class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
   bool isVisible = false;
   Map<String, int> selectedServices = {};
-
   final TextEditingController searchController = TextEditingController();
+  final AllHomeServicesCategoryController controller = Get.find<AllHomeServicesCategoryController>();
 
   void updateService(String title, bool isAdding) {
     setState(() {
@@ -36,6 +40,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
         }
       }
       isVisible = selectedServices.isNotEmpty;
+      debugPrint('CategoryDetailsScreen: Updated selectedServices=$selectedServices');
     });
   }
 
@@ -49,11 +54,21 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
           ? FloatingActionButton.extended(
         backgroundColor: AppColors.buttonColor,
         onPressed: () {
+          // Map selectedServices to full Service objects
+          final selectedServiceDetails = widget.services
+              .where((service) => selectedServices.containsKey(service.serviceName))
+              .map((service) => {
+            'service': service,
+            'quantity': selectedServices[service.serviceName] ?? 0,
+          })
+              .toList();
+          debugPrint('CategoryDetailsScreen: Navigating to CheckoutScreen with selectedServices=$selectedServices, selectedServiceDetails=$selectedServiceDetails');
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => CheckoutScreen(
-                selectedServices: selectedServices,
+                selectedServices: Map.from(selectedServices),
+                selectedServiceDetails: selectedServiceDetails,
               ),
             ),
           );
@@ -95,8 +110,8 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
           : null,
       appBar: AppBar(
         title: Text(widget.category.categoryName ?? 'Category'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.whiteTheme,
+        foregroundColor: AppColors.darkBlueShade,
         elevation: 0,
       ),
       body: Padding(
@@ -111,25 +126,28 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                 filled: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: AppColors.whiteTheme, width: 1),
+                  borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: AppColors.lightWhite, width: 2),
+                  borderSide: BorderSide(color: AppColors.darkBlueShade, width: 2),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: AppColors.lightWhite, width: 1),
+                  borderSide: BorderSide.none,
                 ),
                 hintText: "Search services",
+                hintStyle: TextStyle(color: Colors.grey.shade500),
+                prefixIcon: Icon(Icons.search, color: Colors.grey.shade500),
               ),
             ),
+            SizedBox(height: height * 0.02),
             Expanded(
               child: widget.services.isEmpty
                   ? Center(
                 child: Text(
-                  'No services available for ${widget.category.categoryName}',
-                  style: const TextStyle(fontSize: 18),
+                  'No services available for ${widget.category.categoryName ?? 'this category'}',
+                  style:  TextStyle(fontSize: 18, color: AppColors.hintGrey),
                 ),
               )
                   : ListView.builder(
@@ -140,11 +158,8 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                     image: service.image ?? 'assets/images/default.png',
                     title: service.serviceName ?? 'Unknown Service',
                     description: service.description ?? 'No description',
-                    oldPrice:
-                    int.tryParse(service.regularPrice ?? '0') ?? 0,
-                    newPrice: int.tryParse(
-                        service.salePrice ?? service.regularPrice ?? '0') ??
-                        0,
+                    oldPrice: int.tryParse(service.regularPrice ?? '0') ?? 0,
+                    newPrice: int.tryParse(service.salePrice ?? service.regularPrice ?? '0') ?? 0,
                     rating: service.isFeatured == true ? 4.8 : 4.3,
                     onServiceUpdate: updateService,
                   );
@@ -201,7 +216,7 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
               child: widget.image.startsWith('http')
                   ? Image.network(
                 widget.image,
-                width: width * 0.2, // Reduced width to prevent overflow
+                width: width * 0.2,
                 height: height * 0.09,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Icon(
@@ -285,7 +300,7 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
             count == 0
                 ? SizedBox(
               height: height * 0.04,
-              width: width * 0.15, // Reduced width to prevent overflow
+              width: width * 0.15,
               child: ElevatedButton(
                 onPressed: () {
                   setState(() => count++);
@@ -312,7 +327,7 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
                       style: TextStyle(
                         color: AppColors.whiteTheme,
                         fontWeight: FontWeight.bold,
-                        fontSize: 12, // Reduced font size
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -321,7 +336,7 @@ class _ServiceCardWidgetState extends State<ServiceCardWidget> {
             )
                 : Container(
               height: height * 0.04,
-              width: width * 0.18, // Reduced width to prevent overflow
+              width: width * 0.18,
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.buttonColor, width: 1.5),
                 borderRadius: BorderRadius.circular(8),

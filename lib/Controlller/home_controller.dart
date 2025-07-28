@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:untitled2/constants/app_urls.dart';
-import '../models/home_model.dart'; // Correct the path as per your folder structure
+import '../SharedPreference/shared_preference.dart';
+import '../models/home_model.dart';
 
 class HomeController extends GetxController {
   var isLoading = false.obs;
@@ -18,26 +19,39 @@ class HomeController extends GetxController {
   void fetchHomeData() async {
     isLoading(true);
     try {
-      debugPrint("📡 Fetching home data...");
+      debugPrint("📡 [HomeController] Fetching home data...");
+
+      // Get auth token from SharedPreferences
+      final token = await SharedPreferencesHelper.getAuthToken();
+
+      if (token == null || token.isEmpty) {
+        debugPrint("❗ [HomeController] No auth token found!");
+        isLoading(false);
+        return;
+      }
+
+      debugPrint("🔐 [HomeController] Using token: $token");
+
       final response = await http.get(
         Uri.parse(AppUrls.getHome),
         headers: {
           'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
         },
       );
 
-      debugPrint("📥 Response status: ${response.statusCode}");
-      debugPrint("📥 Response body: ${response.body}");
+      debugPrint("📥 [HomeController] Response status: ${response.statusCode}");
+      debugPrint("📥 [HomeController] Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         homeModel.value = HomeModel.fromJson(jsonData);
-        debugPrint("✅ Home data parsed successfully");
+        debugPrint("✅ [HomeController] Home data parsed successfully");
       } else {
-        debugPrint("❌ Failed to fetch home data");
+        debugPrint("❌ [HomeController] Failed to fetch home data");
       }
     } catch (e) {
-      debugPrint("💥 Exception occurred: $e");
+      debugPrint("💥 [HomeController] Exception: $e");
     } finally {
       isLoading(false);
     }

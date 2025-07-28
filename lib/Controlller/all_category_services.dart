@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -17,36 +16,38 @@ class AllHomeServicesCategoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    debugPrint('HomeServicesController: onInit called');
+    debugPrint('AllHomeServicesCategoryController: onInit called');
     fetchCategories();
   }
 
   Future<void> fetchCategories() async {
-    debugPrint('HomeServicesController: Starting fetchCategories');
+    debugPrint('AllHomeServicesCategoryController: Starting fetchCategories');
     isLoading.value = true;
     errorMessage.value = '';
 
     try {
-      // Get token from SharedPreferences
+      // Get token and customerId from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
       final customerId = await SharedPreferencesHelper.getUserId();
-      debugPrint('HomeServicesController: Retrieved token=$token, customerId=$customerId');
+      debugPrint('AllHomeServicesCategoryController: Retrieved token=$token, customerId=$customerId');
 
       if (token == null || customerId == null) {
-        debugPrint('HomeServicesController: Authentication data missing');
+        debugPrint('AllHomeServicesCategoryController: Authentication data missing');
         errorMessage.value = 'User not authenticated. Please log in again.';
         Get.snackbar(
           'Error',
           errorMessage.value,
           backgroundColor: Colors.red,
           colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
         );
+        Get.offAllNamed('/enter_phone_number');
         return;
       }
 
       final url = Uri.parse(AppUrls.allCategoryServices);
-      debugPrint('HomeServicesController: Sending GET to $url');
+      debugPrint('AllHomeServicesCategoryController: Sending GET to $url');
 
       final response = await http.get(
         url,
@@ -59,32 +60,47 @@ class AllHomeServicesCategoryController extends GetxController {
         throw Exception('Fetch categories request timed out');
       });
 
-      debugPrint('HomeServicesController: Response status=${response.statusCode}, body=${response.body}');
+      debugPrint('AllHomeServicesCategoryController: Response status=${response.statusCode}, body=${response.body}');
 
       if (response.statusCode == 200) {
-        final allCategoryServices = AllCategoryServices.fromJson(jsonDecode(response.body));
-        debugPrint('HomeServicesController: Parsed response success=${allCategoryServices.success}');
+        final jsonResponse = jsonDecode(response.body);
+        debugPrint('AllHomeServicesCategoryController: Parsed JSON response=$jsonResponse');
+
+        final allCategoryServices = AllCategoryServices.fromJson(jsonResponse);
+        debugPrint('AllHomeServicesCategoryController: Parsed success=${allCategoryServices.success}, data=${allCategoryServices.data?.toJson()}');
 
         if (allCategoryServices.success == true && allCategoryServices.data != null) {
-          if (allCategoryServices.data!.category != null) {
-            categories.add(allCategoryServices.data!.category!);
+          if (allCategoryServices.data!.categories != null && allCategoryServices.data!.categories!.isNotEmpty) {
+            categories.assignAll(allCategoryServices.data!.categories!);
             debugPrint(
-                'HomeServicesController: Added category=${allCategoryServices.data!.category!.toJson()}');
+                'AllHomeServicesCategoryController: Added ${allCategoryServices.data!.categories!.length} categories: ${categories.map((c) => c.toJson())}');
+          } else {
+            debugPrint('AllHomeServicesCategoryController: No categories found in response');
+            // Only set error if no services are available either
+            if (allCategoryServices.data!.services == null || allCategoryServices.data!.services!.isEmpty) {
+              errorMessage.value = 'No categories or services available';
+            }
           }
-          if (allCategoryServices.data!.services != null) {
-            services.addAll(allCategoryServices.data!.services!);
+          if (allCategoryServices.data!.services != null && allCategoryServices.data!.services!.isNotEmpty) {
+            services.assignAll(allCategoryServices.data!.services!);
             debugPrint(
-                'HomeServicesController: Added services=${allCategoryServices.data!.services!.map((s) => s.toJson())}');
+                'AllHomeServicesCategoryController: Added ${allCategoryServices.data!.services!.length} services: ${services.map((s) => s.toJson())}');
+          } else {
+            debugPrint('AllHomeServicesCategoryController: No services found in response');
+            if (allCategoryServices.data!.categories == null || allCategoryServices.data!.categories!.isEmpty) {
+              errorMessage.value = 'No categories or services available';
+            }
           }
-          debugPrint('HomeServicesController: Total services=${allCategoryServices.data!.totalServices}');
+          debugPrint('AllHomeServicesCategoryController: Total services=${allCategoryServices.data!.totalServices}');
         } else {
-          debugPrint('HomeServicesController: No data or success=false');
-          errorMessage.value = 'No categories found';
+          debugPrint('AllHomeServicesCategoryController: Success=false or no data');
+          errorMessage.value = jsonResponse['message'] ?? 'No categories or services found';
           Get.snackbar(
             'Error',
             errorMessage.value,
             backgroundColor: Colors.red,
             colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
           );
         }
       } else {
@@ -97,35 +113,37 @@ class AllHomeServicesCategoryController extends GetxController {
             error = errors.values.expand((e) => e as List).join(', ');
           }
         } catch (e) {
-          debugPrint('HomeServicesController: Error parsing response: $e');
+          debugPrint('AllHomeServicesCategoryController: Error parsing error response: $e');
         }
-        debugPrint('HomeServicesController: Server error: $error');
+        debugPrint('AllHomeServicesCategoryController: Server error: $error');
         errorMessage.value = error;
         Get.snackbar(
           'Error',
           errorMessage.value,
           backgroundColor: Colors.red,
           colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
         );
       }
     } catch (e, stackTrace) {
-      debugPrint('HomeServicesController: Error fetching categories: $e');
-      debugPrint('HomeServicesController: Stack trace: $stackTrace');
-      errorMessage.value = 'Failed to fetch categories: $e';
+      debugPrint('AllHomeServicesCategoryController: Error fetching categories: $e');
+      debugPrint('AllHomeServicesCategoryController: Stack trace: $stackTrace');
+      errorMessage.value = 'Failed to fetch categories: ${e.toString()}';
       Get.snackbar(
         'Error',
         errorMessage.value,
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
       isLoading.value = false;
-      debugPrint('HomeServicesController: isLoading set to false');
+      debugPrint('AllHomeServicesCategoryController: isLoading set to false');
     }
   }
 
   // Map category names to icons
-  IconData getCategoryIcon(String categoryName) {
+  IconData getCategoryIcon(String? categoryName) {
     final iconMap = {
       'AC Services': Icons.ac_unit,
       'Carpenter': Icons.handyman,
@@ -136,7 +154,7 @@ class AllHomeServicesCategoryController extends GetxController {
       'Home Inspection': Icons.search,
       'Painter': Icons.format_paint,
       'Pest Control': Icons.bug_report,
-      'Plumber': Icons.plumbing,
+      'Plumbing': Icons.plumbing,
     };
     return iconMap[categoryName] ?? Icons.build;
   }

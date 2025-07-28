@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../Auth/authentication_screen.dart';
-import '../Auth/enter_phone_number.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:untitled2/AppColors/app_colors.dart';
+import 'package:untitled2/Auth/enter_phone_number.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -42,13 +43,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _checkOnboardingStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    bool hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    final box = GetStorage();
+    bool hasSeenOnboarding = box.read('hasSeenOnboarding') ?? false;
     if (hasSeenOnboarding) {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => EnterPhoneNumber(),
+          pageBuilder: (context, animation, secondaryAnimation) => const EnterPhoneNumber(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -72,7 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => EnterPhoneNumber(),
+          pageBuilder: (context, animation, secondaryAnimation) => const EnterPhoneNumber(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -83,15 +84,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _markOnboardingAsSeen() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('hasSeenOnboarding', true);
+    final box = GetStorage();
+    await box.write('hasSeenOnboarding', true);
   }
 
   @override
   Widget build(BuildContext context) {
     final color = Color(int.parse(onboardingData[currentPage]["color"]!.substring(1, 7), radix: 16) + 0xFF000000);
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -142,8 +141,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             right: 0,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 500),
-              height: height * 0.3,
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              height: 30.h,
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
@@ -164,20 +163,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       onboardingData[currentPage]["heading"]!,
                       key: ValueKey<String>(onboardingData[currentPage]["heading"]!),
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 24.sp,
                         fontWeight: FontWeight.bold,
                         color: color,
                       ),
                     ),
                   ),
-                  SizedBox(height: height * 0.0050),
+                  SizedBox(height: 0.5.h),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
                     child: Text(
                       onboardingData[currentPage]["text"]!,
                       key: ValueKey<String>(onboardingData[currentPage]["text"]!),
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: TextStyle(
+                        fontSize: 16.sp,
                         color: Colors.black54,
                         height: 1.5,
                       ),
@@ -206,9 +205,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         backgroundColor: color,
                         elevation: 0,
                         child: Icon(
-                          currentPage == onboardingData.length - 1
-                              ? Icons.check
-                              : Icons.arrow_forward,
+                          currentPage == onboardingData.length - 1 ? Icons.check : Icons.arrow_forward,
                           color: Colors.white,
                         ),
                       ),
